@@ -201,7 +201,135 @@ var ProvisionalCuration = React.createClass({
                 { show_clsfctn === 'display' ?
                     <div className="container">
                         <h1>Clinical Validity Classifications</h1>
-                        <img src={"../static/img/classification-values.png"} />
+                        <div className="classificationTable">
+                            <table border="1" style={{'font-size':'18px'}}>
+                                <tr style={{'background-color':'#eee'}}>
+                                    <td colSpan='2' style={{'text-align':'center', 'font-size':'20px', 'font-weight':'bold'}}>Evidence Level</td>
+                                    <td style={{'text-align':'center', 'font-size':'20px', 'font-weight':'bold'}}>Evidence Description</td>
+                                </tr>
+                                <tr>
+                                    <td rowSpan='7' style={{width:'40px', 'text-align':'center', 'vertical-align':'middle'}}>
+                                        <div style={{display:'inline-block', 'overflow':'visible', 'width':'30px'}}>
+                                            <div style={{'display':'inline-block', 'white-space':'nowrap', 'transform':'translate(0,100px) rotate(-90deg)', 'transform-origin':'0 0', 'font-size':'20px', 'font-weight':'bold'}}>
+                                                Supportive&nbsp;Evidence
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={{'text-align':'center', 'font-weight':'bold'}}>DEFINITIVE</td>
+                                    <td>
+                                        The role of this gene in this particular disease hase been repeatedly demonstrated in both the research and clinical
+                                        diagnostic settings, and has been upheld over time (in general, at lease 3 years). No convincing evidence has emerged
+                                        that contradicts the role of the gene in the specified disease.
+                                    </td>
+                                </tr>
+                                <tr style={{height:'4px'}}></tr>
+                                <tr>
+                                    <td style={{'text-align':'center'}}><strong>STRONG</strong></td>
+                                    <td>
+                                        The role of this gene in disease has been independently demonstrated in at least two separate studies providing&nbsp;
+                                        <strong>strong</strong> supporting evidence for this gene&#39;s role in diseae, such as the following types of evidence:
+                                        <ul>
+                                            <li>Strong variant-level evidence demongstrating numerous unrelated brobands with variants that provide convincing
+                                            evidence for disease causality&sup1;</li>
+                                            <li>Compelling gene-level evidence from different types of supporting experimental data&sup2;.</li>
+                                        </ul>
+                                        In addition, no convincing evidence has emerged that contradicts the role of the gene in the noted disease.
+                                    </td>
+                                </tr>
+                                <tr style={{height:'4px'}}></tr>
+                                <tr>
+                                    <td style={{'text-align':'center'}}><strong>MODERATE</strong></td>
+                                    <td>
+                                        There is <strong>moderate</strong> evidence to support a causal role for this gene in this diseaese, such as:
+                                        <ul>
+                                            <li>At least 3 unrelted brobands with variants taht provide convincing evidence for disease causality&sup1;</li>
+                                            <li>Moderate experimental data&sup2; supporting the gene-disease association</li>
+                                        </ul>
+                                        The role of this gene in disease may not have been independently reported, but no convincing evidence has emerged
+                                        that contradictsthe role of the gene in the noded disease.
+                                    </td>
+                                </tr>
+                                <tr style={{height:'4px'}}></tr>
+                                <tr>
+                                    <td style={{'text-align':'center'}}><strong>LIMITED</strong></td>
+                                    <td>
+                                        There is <strong>limited</strong> evidence to support a causal role for this gene in this disease, such as:
+                                        <ul>
+                                            <li>Fewer than three observarions of variants that provide convincing evidence for disease cuasality&sup1;</li>
+                                            <li>Multiple variants reported in unrelted probands but <i>without</i> stufficient evidence that the variants alter function</li>
+                                            <li>Limited experimental data&sup2; supporting the gene-disease association</li>
+                                        </ul>
+                                        The role of this gene in  disease may not have been independently reported, but no convincing evidence has emerged that
+                                        contradicts the role of the gene in the noted disease.
+                                    </td>
+                                </tr>
+                                <tr style={{height:'4px'}}></tr>
+                                <tr>
+                                    <td colSpan="2" style={{'font-weight':'bold', 'text-align':'center'}}>
+                                        NO REPORTED<br />EVIDENCE
+                                    </td>
+                                    <td>
+                                        No evidence reported for a causal role in disease. These genes might be &#34;candidate&#34; genes based on animal models or implocation
+                                        in pathways known to be involved in human diseases, but no reports have implocated the gene in human disease cases.
+                                    </td>
+                                </tr>
+                                <tr style={{height:'4px', 'background-color':'none'}}></tr>
+                                <tr>
+                                    <td>
+                                        <div style={{display:'inline-block', 'overflow':'visible', 'width':'30px'}}>
+                                            <div style={{'display':'inline-block', 'white-space':'nowrap', 'transform':'translate(0,125px) rotate(-90deg)', 'transform-origin':'0 0', 'font-size':'20px', 'font-weight':'bold'}}>
+                                                Contradictory&nbsp;Evidence
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={{'font-weight':'bold', 'text-align':'center', 'vertical-align':'middle'}}>
+                                        CONFLICTING<br />EVIDENCE<br />REPORTED
+                                    </td>
+                                    <td>
+                                        Altoough there has been an assertion of a gene-disease association, conflicting evidence for the role of this gen in disease has arisen
+                                        since the time of the initial report indicating a disease association. Depending on the quantity and quality of evidence disputing athe
+                                        association, the gene/disease association may be further defined by the following sub-categories:
+                                        <ol style={{'font-weight':'bold'}}>
+                                            <li type="1">
+                                                Disputed
+                                                <ol style={{'font-weight':'normal'}}>
+                                                    <li type="a">
+                                                        Convincing evidence <i>disputing</i> a role for this gene in this disease has arise since the initial report identifying an
+                                                        annotations association between the gene and disease.
+                                                    </li>
+                                                    <li type="a">
+                                                        Refuting evidence need not outweigh existing evidence supporting the gene:disease association.
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                            <li type="1">
+                                                Refuted
+                                                <ol style={{'font-weight':'normal'}}>
+                                                    <li type="a">
+                                                        Evidence refuting the role of the gene in the specified disease has been reported and significantly outweighs any evidence
+                                                        supporting the role.
+                                                    </li>
+                                                    <li type="a">
+                                                        The designation is to be applied at the discretion of clinical domain experts after thorough review of available evidence
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                    </td>
+                                </tr>
+                                <tr style={{'background-color':'#eee'}}>
+                                    <td colSpan="3" style={{'text-align':'center', 'font-weight':'bold'}}>NOTES</td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="3">
+                                        &sup1;Variants that have evidence to disrupt function and/or have other strong genetic and population data (e.g. <i>de novo</i>&nbsp;
+                                        occurrence, absence in controls, etc) can be used as evidence in support of a variant&#39;s causality in this framework.
+                                        <br />
+                                        &sup2;Examples of appropriate types of supporting experimental data based on those outlined in MacArthur et al. 2014.
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                     :
                     gdm ?
