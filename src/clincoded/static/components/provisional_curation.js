@@ -273,7 +273,7 @@ globals.curator_page.register(ProvisionalCuration,  'curator_page', 'provisional
 
 var Classification = function() {
     return (
-        <div className="container">
+        <div className="container" style={{'padding-bottom':'10px'}}>
             <h1>Clinical Validity Classifications</h1>
             <div className="classificationTable">
                 <table>
@@ -284,7 +284,7 @@ var Classification = function() {
                     <tr>
                         <td rowSpan='7' className="verticalCell">
                             <div className="verticalBox">
-                                <div className="verticalContent" style={{'transform':'translate(0,100px) rotate(-90deg)'}}>
+                                <div className="verticalContent spptEvd">
                                     Supportive&nbsp;Evidence
                                 </div>
                             </div>
@@ -349,7 +349,7 @@ var Classification = function() {
                     <tr>
                         <td className="verticalCell">
                             <div className="verticalBox">
-                                <div className="verticalContent" style={{'transform':'translate(0,125px) rotate(-90deg)'}}>
+                                <div className="verticalContent cntrdctEvd">
                                     Contradictory&nbsp;Evidence
                                 </div>
                             </div>
@@ -390,14 +390,15 @@ var Classification = function() {
                         </td>
                     </tr>
                     <tr className="greyRow">
-                        <td colSpan="3" className="titleCell">NOTES</td>
+                        <td colSpan="3" className="levelCell">NOTES</td>
                     </tr>
                     <tr>
                         <td colSpan="3">
-                            &sup1;Variants that have evidence to disrupt function and/or have other strong genetic and population data (e.g. <i>de novo</i>&nbsp;
-                            occurrence, absence in controls, etc) can be used as evidence in support of a variant&#39;s causality in this framework.
-                            <br /><br />
-                            &sup2;Examples of appropriate types of supporting experimental data based on those outlined in MacArthur et al. 2014.
+                            <p>
+                                &sup1;Variants that have evidence to disrupt function and/or have other strong genetic and population data (e.g. <i>de novo</i>&nbsp;
+                                occurrence, absence in controls, etc) can be used as evidence in support of a variant&#39;s causality in this framework.
+                            </p>
+                            <p>&sup2;Examples of appropriate types of supporting experimental data based on those outlined in MacArthur et al. 2014.</p>
                         </td>
                     </tr>
                 </table>
