@@ -389,16 +389,12 @@
             "title": "Label",
             "type": "string"
         },
-        "commonDiagnosis": {
-            "title": "Common Diagnosis",
-            "type": "string"
-        },
-        "individualIncluded": {
-            "title": "Individual",
-            "type": "string"
-        },
-        "submitted_by.uuid": {
+        "submitted_by.title": {
             "title": "Creator",
+            "type": "string"
+        },
+        "submitted_by.email": {
+            "title": "Email",
             "type": "string"
         },
         "date_created": {

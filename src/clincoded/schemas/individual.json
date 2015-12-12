@@ -262,12 +262,12 @@
             "title": "Creator",
             "type": "string"
         },
-        "date_created": {
-            "title": "Creation Date",
+        "submitted_by.email": {
+            "title": "Email",
             "type": "string"
         },
-        "last_modified": {
-            "title": "Last Modified",
+        "date_created": {
+            "title": "Creation Date",
             "type": "string"
         }
     }
