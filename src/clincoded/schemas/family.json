@@ -389,6 +389,10 @@
             "title": "Label",
             "type": "string"
         },
+        "uuid": {
+            "title": "UUID",
+            "type": "string"
+        },
         "submitted_by.title": {
             "title": "Creator",
             "type": "string"

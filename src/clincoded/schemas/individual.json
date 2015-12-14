@@ -254,6 +254,10 @@
             "title": "Label",
             "type": "string"
         },
+        "uuid": {
+            "title": "UUID",
+            "type": "string"
+        },
         "is_proband": {
             "title": "Probands",
             "type": "string"
