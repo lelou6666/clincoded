@@ -44,6 +44,7 @@ before_script:
         --logfile $SC_LOGFILE \
         --pidfile $SC_PIDFILE \
         --tunnel-identifier $TRAVIS_JOB_NUMBER \
+        --rest-url https://$SAUCE_USERNAME:$SAUCE_ACCESS_KEY@saucelabs.com/rest/v1/clincoded/suites/b824d5bda5ac422b9001756acdf9f4d8/start
         --user $SAUCE_USERNAME --api-key $SAUCE_ACCESS_KEY > /dev/null &
       while test -f "$SC_PIDFILE" && test ! -f "$SC_READYFILE"; do 
         sleep 0.5
