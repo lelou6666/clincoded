@@ -1572,7 +1572,7 @@ var flattenSegregation = module.exports.flattenSegregation = function(segregatio
 
 
 var individualSimpleProps = ["label", "sex", "hpoIdInDiagnosis", "termsInDiagnosis", "hpoIdInElimination", "termsInElimination", "countryOfOrigin", "ethnicity",
-    "race", "ageType", "ageValue", "ageUnit", "method", "additionalInformation", "proband", "date_created"
+    "race", "ageType", "ageValue", "ageUnit", "method", "genotype", "additionalInformation", "proband", "date_created"
 ];
 
 function flattenIndividual(individual) {
@@ -1598,13 +1598,6 @@ function flattenIndividual(individual) {
         flat.variants = individual.variants.map(function(variant) {
             return variant['@id'];
         });
-    }
-
-    if (individual.genotype) {
-        flat.genotype = individual.genotype;
-    } else {
-        // set genotype for product data before R4
-        flat.genotype = '';
     }
 
     return flat;
@@ -1846,7 +1839,8 @@ var renderPhenotype = module.exports.renderPhenotype = function(objList, title) 
 var renderMutalyzerLink = module.exports.renderMutalyzerLink = function() {
     return (
         <p className="col-sm-7 col-sm-offset-5 mutalyzer-link">
-            (e.g. HGVS, RCV, refSNP (rs) ID)<br />For help in verifying, generating or converting to HGVS nomenclature, please visit <a href='https://mutalyzer.nl/' target='_blank'>Mutalyzer</a>.
+            (e.g. HGVS, RCV, refSNP (rs) ID)<br />For help in verifying, generating or converting to HGVS nomenclature, please visit&nbsp;
+            <a href='https://mutalyzer.nl/' target='_blank'>Mutalyzer</a>.
         </p>
     );
 };

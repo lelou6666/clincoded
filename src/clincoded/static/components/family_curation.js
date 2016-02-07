@@ -499,7 +499,7 @@ var FamilyCuration = React.createClass({
         var valid;
         var anyInvalid = false;
 
-        // Check Variant panel inputs for correct formats
+        // Check Variant fields for correct formats
         for (var i = 0; i < this.state.variantCount; i++) {
             var value = this.getFormValue('VARclinvarid' + i);
             if (value) {
@@ -576,10 +576,10 @@ var FamilyCuration = React.createClass({
             }
 
             // family with proabnd can not delete all variant
-            if (this.state.probandIndividual && this.getFormValue('genotype') === 'none') {
-                formError = true;
-                this.setFormErrors('genotype', 'A proband individual with variant(s) exists. Please select Dominant, Homozygous Recessive or Compound Heterozygous.');
-            }
+            //if (this.state.probandIndividual && this.getFormValue('genotype') === 'none') {
+            //    formError = true;
+            //    this.setFormErrors('genotype', 'A proband individual with variant(s) exists. Please select Dominant, Homozygous Recessive or Compound Heterozygous.');
+            //}
 
             if (!formError) {
                 // Build search string from given ORPHA IDs, empty string if no Orphanet id entered.
@@ -709,12 +709,16 @@ var FamilyCuration = React.createClass({
                     var searchStrs = [];
                     for (var i = 0; i < this.state.variantCount; i++) {
                         // Grab the values from the variant form panel
-                        var clinvarId = this.getFormValue('VARclinvarid' + i);
+                        var clinvarId = (this.getFormValue('VARclinvarid' + i) && this.getFormValue('VARclinvarid' + i) !== '') ? this.getFormValue('VARclinvarid' + i).trim() : null;
+                        var otherDesc = (this.getFormValue('VARothervariant' + i) && this.getFormValue('VARothervariant' + i) !== '') ? this.getFormValue('VARothervariant' + i).trim() : null;
 
                         // Build the search string depending on what the user entered
                         if (clinvarId) {
                             // Make a search string for these terms
                             searchStrs.push('/search/?type=variant&clinvarVariantId=' + clinvarId);
+                        }
+                        if (otherDesc) {
+                            searchStrs.push('/search/?type=variant&otherDescription=' + otherDesc);
                         }
                     }
 
@@ -733,10 +737,20 @@ var FamilyCuration = React.createClass({
                                 } else {
                                     // Search got no result; make a new variant and save it in an array so we can write them.
                                     // Look for the term in the filters to see what term failed to find a match
-                                    var termResult = _(result.filters).find(function(filter) { return filter.field === 'clinvarVariantId'; });
-                                    if (termResult) {
-                                        var newVariant = {};
-                                        newVariant.clinvarVariantId = termResult.term;
+                                    //var termResult;
+                                    var newVariant = {};
+                                    var vIDEntered = _(result.filters).find(function(filter) { return filter.field === 'clinvarVariantId'; });
+                                    //var searchByOtherDesc = _(result.filters).find(function(filter) { return filter.field === 'otherDescription'; });
+                                    if (vIDEntered) {
+                                        newVariant.clinvarVariantId = vIDEntered.term;
+                                    } else {
+                                        newVariant.otherDescription = _(result.filters).find(function(filter) { return filter.field === 'otherDescription'; }).term;
+                                        //termResult = _(result.filters).find(function(filter) { return filter.field === 'otherDescription'; });
+                                    }
+                                    //if (termResult) {
+                                    if (newVariant.clinvarVariantId || newVariant.otherDescription) {
+                                        //var newVariant = {};
+                                        //newVariant.clinvarVariantId = termResult.term;
                                         newVariants.push(newVariant);
                                     }
                                 }
@@ -752,6 +766,7 @@ var FamilyCuration = React.createClass({
                 }).then(newVariants => {
                     // We're passed in a list of new clinVarRCV variant objects that need to be written to the DB.
                     // Now see if we need to add 'Other description' data. Search for any variants in the form with that field filled.
+                    /*
                     for (var i = 0; i < this.state.variantCount; i++) {
                         // Grab the values from the variant form panel
                         var otherVariantText = this.getFormValue('VARothervariant' + i).trim();
@@ -764,7 +779,7 @@ var FamilyCuration = React.createClass({
                             newVariants.push(newVariant);
                         }
                     }
-
+                    */
                     // Now write the new variants to the DB, and push their @ids to the family variant
                     if (newVariants && newVariants.length) {
                         return this.postRestDatas(
@@ -789,7 +804,7 @@ var FamilyCuration = React.createClass({
                     return Promise.resolve(null);
                 }).then(data => {
                     var label, diseases;
-                    var genotype = this.getFormValue('genotype');
+                    var genotype = (this.getFormValue('genotype') && this.getFormValue('genotype') !== 'none') ? this.getFormValue('genotype') : null;
 
                     // If we're editing a family, see if we need to update it and its proband individual
                     if (currFamily) {
@@ -1611,9 +1626,9 @@ var FamilyVariant = function() {
                         indicated next to the inheritance name. Note that <strong>each variant must be assessed as supports</strong> for the Individual to be counted.
                     </p>
                 </div>
-                <div className="row">
-                    <Input type="select" ref="genotype" label="Mode of Inheritance:" defaultValue="none" value={genotype} error={this.getFormError('genotype')} clearError={this.clrFormErrors.bind(null, 'genotype')}
-                        labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" handleChange={this.handleChange}>
+                <div>
+                    <Input type="select" ref="genotype" label="Mode of Inheritance:" defaultValue="none" value={genotype} labelClassName="col-sm-5 control-label"
+                        wrapperClassName="col-sm-7" groupClassName="form-group" handleChange={this.handleChange}>
                         {this.state.preR4Edit ? <option value="none">Plesae select Dominant or Homozygous Recessive</option> : <option value="none">No Selection</option>}
                         <option disabled="disabled"></option>
                         <option value="Dominant">Dominant (enter 1 variant)</option>
@@ -1661,11 +1676,12 @@ var FamilyVariant = function() {
                                 labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" inputDisabled="disabled" />
                         }
                         {curator.renderMutalyzerLink()}
+                        <br />
                     </div>
                 );
             })}
             {this.state.variantCount && !this.state.probandIndividual && this.state.individualRequired ?
-                <div className="variant-panel clearfix">
+                <div className="variant-panel">
                     <Input type="text" ref="individualname" label="Individual Label"
                         error={this.getFormError('individualname')} clearError={this.clrFormErrors.bind(null, 'individualname')}
                         labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" required />

@@ -1712,6 +1712,7 @@ var makeStarterIndividual = module.exports.makeStarterIndividual = function(labe
 
 // Update the individual with the variants, and write the updated individual to the DB.
 var updateProbandVariants = module.exports.updateProbandVariants = function(individual, genotype, variants, context) {
+    /*
     var updateNeeded = true;
 
     // Check whether the variants from the family are different from the variants in the individual
@@ -1727,14 +1728,35 @@ var updateProbandVariants = module.exports.updateProbandVariants = function(indi
 
     if (updateNeeded) {
         var writerIndividual = curator.flatten(individual);
-        writerIndividual.genotype = genotype;
-        writerIndividual.variants = variants;
+        if (genotype && genotype !== 'none') {
+            writerIndividual.genotype = genotype;
+            writerIndividual.variants = variants;
+        } else {
+            if (writerIndividual.genotype) {
+                delete writerIndividual.genotype;
+            }
+            if (writerIndividual.variants) {
+                delete writerIndividual.variants;
+            }
+        }
 
         return context.putRestData('/individuals/' + individual.uuid, writerIndividual).then(data => {
             return Promise.resolve(data['@graph'][0]);
         });
     }
     return Promise.resolve(null);
+    */
+
+    var writerIndividual = curator.flatten(individual);
+    if (!genotype && writerIndividual.genotype) {
+        delete writerIndividual.genotype;
+    } else if (genotype !== writerIndividual.genotype) {
+        writerIndividual.genotype = genotype;
+    }
+    writerIndividual.variants = variants;
+    return context.putRestData('/individuals/' + individual.uuid, writerIndividual).then(data => {
+        return Promise.resolve(data['@graph'][0]);
+    });
 };
 
 
