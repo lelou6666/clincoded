@@ -145,7 +145,7 @@ def index_settings():
                             'lowercase',
                         ]
                     },
-                    'encoded_index_analyzer': {
+                    'clincoded_index_analyzer': {
                         'type': 'custom',
                         'tokenizer': 'whitespace',
                         'char_filter': 'html_strip',
@@ -156,7 +156,7 @@ def index_settings():
                             'substring'
                         ]
                     },
-                    'encoded_search_analyzer': {
+                    'clincoded_search_analyzer': {
                         'type': 'custom',
                         'tokenizer': 'whitespace',
                         'filter': [
@@ -195,8 +195,8 @@ def es_mapping(mapping):
     return {
         '_all': {
             'enabled': True,
-            'index_analyzer': 'encoded_index_analyzer',
-            'search_analyzer': 'encoded_search_analyzer'
+            'index_analyzer': 'clincoded_index_analyzer',
+            'search_analyzer': 'clincoded_search_analyzer'
         },
         'dynamic_templates': [
             {
@@ -419,9 +419,16 @@ def type_mapping(types, item_type, embed=True):
         new_mapping = mapping['properties']
         for prop in props:
             new_mapping = new_mapping[prop]['properties']
+<<<<<<< HEAD
         new_mapping[last]['index_analyzer'] = 'encoded_index_analyzer'
         new_mapping[last]['search_analyzer'] = 'encoded_search_analyzer'
         new_mapping[last]['include_in_all'] = True
+=======
+        new_mapping[last]['index_analyzer'] = 'clincoded_index_analyzer'
+        new_mapping[last]['search_analyzer'] = 'clincoded_search_analyzer'
+        if 'include_in_all' in new_mapping[last]:
+            del new_mapping[last]['include_in_all']
+>>>>>>> refs/remotes/ClinGen/dev
 
     # Automatic boost for uuid
     if 'uuid' in mapping['properties']:
@@ -487,7 +494,7 @@ def main():
     app = get_app(args.config_uri, args.app_name)
 
     # Loading app will have configured from config file. Reconfigure here:
-    logging.getLogger('encoded').setLevel(logging.DEBUG)
+    logging.getLogger('clincoded').setLevel(logging.DEBUG)
 
     return run(app, args.item_type, args.dry_run)
 

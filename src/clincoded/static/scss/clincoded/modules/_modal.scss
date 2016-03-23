@@ -1,0 +1,33 @@
+.modal-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: $color-trim;
+    border-bottom: 1px solid $color-trim-dark;
+}
+
+.modal-success {
+    background-color: #5cb85c;
+}
+
+.modal-info {
+    background-color: #5bc0de;
+}
+
+.modal-warning {
+    background-color: #f0ad4e;
+}
+
+.modal-danger {
+    background-color: #d9534f;
+}
+
+.modal-title {
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+}
+
+.modal-content {
+    @include border-radius(2px);
+    @include box-shadow(0 2px 4px rgba(0,0,0,.6));
+}

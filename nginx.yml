@@ -39,11 +39,19 @@ write_files:
 
 - path: /etc/motd
   content: |
+<<<<<<< HEAD
     #########################################
     ##         Nginx proxy server          ##
     ##  For demo instances:                ##
     ##  ssh <name>.instance.encodedcc.org  ##
     #########################################
+=======
+    #############################################
+    ##         Nginx proxy server              ##
+    ##  For demo instances:                    ##
+    ##  ssh <name>.instance.clinicalgenome.org ##
+    #############################################
+>>>>>>> refs/remotes/ClinGen/dev
 
 - path: /etc/nginx/nginx.conf
   content: |
@@ -68,11 +76,14 @@ write_files:
         proxy_read_timeout    5m;
         send_timeout    5m;
 
+<<<<<<< HEAD
         upstream test {
             server v28-test.instance.encodedcc.org;
             keepalive 10;
         }
 
+=======
+>>>>>>> refs/remotes/ClinGen/dev
         server {
             listen 80;
             location = /robots.txt {
@@ -93,9 +104,15 @@ write_files:
 
         server {
             listen 443 ssl spdy;
+<<<<<<< HEAD
             server_name ~^(?<servername>[^.]+)\.demo\.encodedcc\.org$;
             ssl_certificate         /etc/nginx/ssl/demo.encodedcc.org/server.chained.crt;
             ssl_certificate_key     /etc/nginx/ssl/demo.encodedcc.org/server.key;
+=======
+            server_name ~^(?<servername>[^.]+)\.demo\.clinicalgenome\.org$;
+            ssl_certificate         /etc/nginx/ssl/demo.clinicalgenome.org/server.chained.crt;
+            ssl_certificate_key     /etc/nginx/ssl/demo.clinicalgenome.org/server.key;
+>>>>>>> refs/remotes/ClinGen/dev
             location / {
                 # Normalize duplicate slashes
                 if ($request ~ ^(GET|HEAD)\s([^?]*)//(.*)\sHTTP/[0-9.]+$) {
@@ -104,7 +121,11 @@ write_files:
                 proxy_set_header  Host  $host;
                 proxy_set_header  X-Forwarded-For    $proxy_add_x_forwarded_for;
                 proxy_set_header  X-Forwarded-Proto  $scheme;
+<<<<<<< HEAD
                 proxy_pass  http://$servername.instance.encodedcc.org;
+=======
+                proxy_pass  http://$servername.instance.clinicalgenome.org;
+>>>>>>> refs/remotes/ClinGen/dev
                 proxy_http_version  1.1;
                 proxy_set_header  Connection  "";
             }
@@ -114,6 +135,7 @@ write_files:
                 proxy_pass $1$is_args$args;
             }
         }
+<<<<<<< HEAD
 
         server {
             listen 443 ssl spdy;
@@ -254,35 +276,41 @@ write_files:
     -----END CERTIFICATE-----
 
 - path: /etc/nginx/ssl/encodeproject.org/server.chained.crt
+=======
+
+    }
+
+- path: /etc/nginx/ssl/demo.clinicalgenome.org/server.chained.crt
+>>>>>>> refs/remotes/ClinGen/dev
   content: |
     -----BEGIN CERTIFICATE-----
-    MIIE4zCCA8ugAwIBAgISESFNplhyevJ+HsCzWlKQIJ41MA0GCSqGSIb3DQEBCwUA
+    MIIE9TCCA92gAwIBAgISESGDRQa0iryNOboBDUfJaqaSMA0GCSqGSIb3DQEBCwUA
     MEwxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSIwIAYD
-    VQQDExlBbHBoYVNTTCBDQSAtIFNIQTI1NiAtIEcyMB4XDTE0MDgxNDE0MTIwMloX
-    DTE5MDgwMjA4MzIwOFowQTEhMB8GA1UECxMYRG9tYWluIENvbnRyb2wgVmFsaWRh
-    dGVkMRwwGgYDVQQDDBMqLmVuY29kZXByb2plY3Qub3JnMIIBIjANBgkqhkiG9w0B
-    AQEFAAOCAQ8AMIIBCgKCAQEA0my8uZHliNNN4KImPynAnKQQ8MTrYNCN6JN9C15C
-    9v2uu6EXn3PW7OyF2eJAUqOqUKG/sHPyzf9Jp1CcIw22WbGDD8FDIYvprYdjvSSt
-    h6ShlZm8+rkk+g25urKE7/mQiMrUTdg/llqxRYY98YQtNp4MTV7JPlcIcq/57Irj
-    jzBbVhPo820FfZ1iofSmEPnnf15qwYH5NhUhPq6sBNJqkSg7iVKC+ITooeqLe0hq
-    pGOBdDJA6ILrGlOMSUImm10rGq45w2fXsJVf3F7Hw9p7RoDSUy3BQk97GFs0gD9m
-    fLZ5pruOW55xlvkQe4+UdidI3g4EwRSnVDG9aEuBffQlmQIDAQABo4IByDCCAcQw
-    DgYDVR0PAQH/BAQDAgWgMEkGA1UdIARCMEAwPgYGZ4EMAQIBMDQwMgYIKwYBBQUH
-    AgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMDEGA1Ud
-    EQQqMCiCEyouZW5jb2RlcHJvamVjdC5vcmeCEWVuY29kZXByb2plY3Qub3JnMAkG
-    A1UdEwQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMD4GA1UdHwQ3
-    MDUwM6AxoC+GLWh0dHA6Ly9jcmwyLmFscGhhc3NsLmNvbS9ncy9nc2FscGhhc2hh
-    MmcyLmNybDCBiQYIKwYBBQUHAQEEfTB7MEIGCCsGAQUFBzAChjZodHRwOi8vc2Vj
-    dXJlMi5hbHBoYXNzbC5jb20vY2FjZXJ0L2dzYWxwaGFzaGEyZzJyMS5jcnQwNQYI
-    KwYBBQUHMAGGKWh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9nc2FscGhhc2hh
-    MmcyMB0GA1UdDgQWBBT5PoW5JtzbVbDOhu9o90EolbOpMDAfBgNVHSMEGDAWgBT1
-    zdU8CFD5ak86t5faVoPmadJo9zANBgkqhkiG9w0BAQsFAAOCAQEAhhfPVGnDrnqm
-    qf8lEafl93f7CgWJIrMvjnF+GRhR8MEdIjnwytu7zpzKAodUpQb7zBoLS3SSj0vw
-    cA5gvYNUUf/feeq+uOcsVPaEG4eqUV6GbZNJwj4DC/t7cccAkEGqk0vh6hzuhPlP
-    gfyUmF+ISpRH9mTEPMyPcFtt/fF0nwj2ZnNwNHdORNgpTjf6aWVhwMnn+G4RGkDc
-    t1kIpDY5ElYyRGmQulTwiPdsMPv3lUkRcgYWtNiEUtwyBtY5YpNjdBHtdNY0PwjZ
-    CNSLgUamupyKTDhHoeShG8mtepfInVbjQWQbMFcfefSQDOdBlLjPoYRHy7XKa+/r
-    w8MyonFB0Q==
+    VQQDExlBbHBoYVNTTCBDQSAtIFNIQTI1NiAtIEcyMB4XDTE1MDcxNDIzNTAyMFoX
+    DTE4MDcxNDIzNTAyMFowRzEhMB8GA1UECxMYRG9tYWluIENvbnRyb2wgVmFsaWRh
+    dGVkMSIwIAYDVQQDDBkqLmRlbW8uY2xpbmljYWxnZW5vbWUub3JnMIIBIjANBgkq
+    hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27Djib6H+mbtjua0tteaCtLsqTi/wFRQ
+    hY0YpzvW6nQNvivS+ZL+CpbLwHQKTkMP+vLxigoqZbaHauBQcBXDliWpeksXH6KU
+    ZEuj0Xpdzz+8VGq7YYhgEtl8zKq+zBowrnNzBbZTk6C04e/2BZSpV82SY4ZBhN37
+    06TqQgGa2Hsv/2AstQLrqQMiXUOq458dmLkYyssQA214X9KAnD1LlTbyNBiDVDBy
+    UID9wia8vipMwWbfZ5A1Ayvzbwks3RVMOoh8fnhi7FR9H8jEH5Y3lymrmPUxvR7C
+    cSgwjCxkMFtfREbfQSFh32mOykxUO8rWZwuaQZqhQzvQOgH+Bgd4tQIDAQABo4IB
+    1DCCAdAwDgYDVR0PAQH/BAQDAgWgMEkGA1UdIARCMEAwPgYGZ4EMAQIBMDQwMgYI
+    KwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkv
+    MD0GA1UdEQQ2MDSCGSouZGVtby5jbGluaWNhbGdlbm9tZS5vcmeCF2RlbW8uY2xp
+    bmljYWxnZW5vbWUub3JnMAkGA1UdEwQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+    CCsGAQUFBwMCMD4GA1UdHwQ3MDUwM6AxoC+GLWh0dHA6Ly9jcmwyLmFscGhhc3Ns
+    LmNvbS9ncy9nc2FscGhhc2hhMmcyLmNybDCBiQYIKwYBBQUHAQEEfTB7MEIGCCsG
+    AQUFBzAChjZodHRwOi8vc2VjdXJlMi5hbHBoYXNzbC5jb20vY2FjZXJ0L2dzYWxw
+    aGFzaGEyZzJyMS5jcnQwNQYIKwYBBQUHMAGGKWh0dHA6Ly9vY3NwMi5nbG9iYWxz
+    aWduLmNvbS9nc2FscGhhc2hhMmcyMB0GA1UdDgQWBBQ40h5wroDOf5Cvg4R8dzNi
+    EnXrrzAfBgNVHSMEGDAWgBT1zdU8CFD5ak86t5faVoPmadJo9zANBgkqhkiG9w0B
+    AQsFAAOCAQEAzgpqz6B4fIvoI6ijndszsr3E/G6gevTmE1Ryz2QTmqI7N+OYkISM
+    pscGNfdMiz5XULvsESZvTfW2TkhifODR/BVZS4R53PXi62QCkX9+ogAXAHdb83qj
+    zXeXCLxwwc9typJpXkBWV6tLRg4329f5W7eNWEvJicH12OipjCe515TVeK+cZ7lF
+    ATQfQ0KOa0nLnwWMKmtpev2nZ56iaiSWYjuXsQyGYmq3gNgruegmEx5MJLHO4xvW
+    yc0iTV20Mcc5STkZqxo9iLJafBWLsJug8WXYpTojwurOgcUgJlqVgqddRyEhRcPj
+    dXKCZQKH+YwRJETM8v6+ddrZT9ER5n21+A==
     -----END CERTIFICATE-----
     -----BEGIN CERTIFICATE-----
     MIIETTCCAzWgAwIBAgILBAAAAAABRE7wNjEwDQYJKoZIhvcNAQELBQAwVzELMAkG
@@ -311,4 +339,8 @@ write_files:
     -----END CERTIFICATE-----
 
 - path: /etc/ssh/users_ca.pub
+<<<<<<< HEAD
   content: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAv/ymOcnN4LhM4NACc3Or116XXJ6KytuOgB/+1qNkOFBqBosrn7cmJ35rsoNHRgYNrCsRE9ch74RKsN6H72FtSJgBhGh/9oUK7Os6Fqt3/ZZXxgxIx6ubs/MTgrxrAnujiBxUXMXQhLKMriNMpo8mt4nGYVtLk9PBjiyfncaS8H9ZKoNio9dhP8bmTuYvioAI35dqKdSlVLyzr/XkZxia8Ki+pQ0N6uuiEwMR3ToM+LSp8wpFOOAiu4PEAujRW7us/+1hlpKWfn0J7/V3826joHE+I967Vg/+ikcVhF77JjK1nib879VgCWfmn1HPQosIpk4yJfVgGvRVI7I2nfBPVw== encoded@demo-l.encodedcc.org
+=======
+  content: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmiM5UBd3Rant92xxhCVZFW+U+gUN3aLkICO1gzOGr/Ps173YgzgVPmdKdiI6vBzCZ8BXMG/aeiBHk2LKA+vFjh1/sFRA51nA+hnBzXuIbWYpsTHaGG3BFhnAP8tzDm/7MYRkIeXLwZRwTeFtrMd9MR/HGBVG5HmbM/jtrvTRWZVwFnXRxLQ3Rs5Y9v1QKOrZs4w5tt3iKBiBr+kJKhDHV5O8COowxjcfSqCZmfafVJQNR+8Dg6cvaizqY+ykHpgzc+a7oXJfo1LDDQELl0DGIPDIa340jMDjSSVV0o+RpjbIXTtH4m3TDpKRmZsTQrnHCMNSp5Uk7mMkhKwIwX1SP clincoded-dev@clinicalgenome.org
+>>>>>>> refs/remotes/ClinGen/dev

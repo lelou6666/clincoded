@@ -1,0 +1,20 @@
+{
+    "esnext": true,
+    "node": true,
+    "predef": [
+        "DOMParser",
+        "afterEach",
+        "beforeEach",
+        "describe",
+        "expect",
+        "it",
+        "jest",
+        "pit",
+        "window",
+        "xdescribe",
+        "xit"
+    ],
+    "globalstrict": true,
+    "newcap": false,
+    "sub": true
+}

@@ -37,6 +37,60 @@ apt_sources:
     qPDlGRlOgVTd9xUfHFkzB52c70E=
     =92oX
     -----END PGP PUBLIC KEY BLOCK-----
+- source: "deb https://deb.nodesource.com/node_5.x trusty main"
+  key: |
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+    Version: GnuPG v1
+    Comment: GPGTools - https://gpgtools.org
+
+    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
+    =CLGF
+    -----END PGP PUBLIC KEY BLOCK-----
 
 bootcmd:
 - cloud-init-per once ssh-users-ca echo "TrustedUserCAKeys /etc/ssh/users_ca.pub" >> /etc/ssh/sshd_config
@@ -68,13 +122,11 @@ packages:
 - libxml2-dev
 - libxslt1-dev
 - lzop
-- nodejs-dev
-- nodejs-legacy
-- npm
+- nodejs
 - ntp
 - oracle-java8-installer
 - oracle-java8-set-default
-- postgresql-9.3
+#- postgresql-9.4
 - pv
 - python2.7-dev
 - python3.4-dev
@@ -92,18 +144,25 @@ output:
   all: '| tee -a /var/log/cloud-init-output.log'
 
 runcmd:
-# Ideally this would build as a different user so encoded only has read
+# Ideally this would build as a different user so clincoded only has read
 # permissions
-- set -e
+- set -ex
+- echo "America/Los_Angeles" | sudo tee /etc/timezone
+- sudo dpkg-reconfigure --frontend noninteractive tzdata
+- sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+- wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+- sudo apt-get update
+- sudo apt-get -y install postgresql-9.4
 - update-rc.d elasticsearch defaults
 - service elasticsearch start
-- chown postgres:postgres /etc/postgresql/9.3/main/*.conf
-- echo "include 'custom.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
+- chown postgres:postgres /etc/postgresql/9.4/main/*.conf
+- echo "include 'custom.conf'" >> /etc/postgresql/9.4/main/postgresql.conf
 - if test "%(ROLE)s" = "demo"
 - then
--   echo "standby_mode = off" >> /etc/postgresql/9.3/main/recovery.conf
--   echo "include 'demo.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
+-   echo "standby_mode = off" >> /etc/postgresql/9.4/main/recovery.conf
+-   echo "include 'demo.conf'" >> /etc/postgresql/9.4/main/postgresql.conf
 - fi
+<<<<<<< HEAD
 - sudo -u postgres createuser encoded
 - sudo -u postgres createdb --owner=encoded encoded
 - mkdir /srv/encoded
@@ -115,46 +174,72 @@ runcmd:
 - chown build:build /opt/cloudwatchmon
 - sudo -u build virtualenv --python=python2.7 /opt/cloudwatchmon
 - sudo -u build /opt/cloudwatchmon/bin/pip install -r cloudwatchmon-requirements.txt
+=======
+- sudo -u postgres createuser clincoded
+- sudo -u postgres createdb --owner=clincoded clincoded
+- mkdir /srv/clincoded
+- chown clincoded:clincoded /srv/clincoded
+- cd /srv/clincoded
+- sudo -u clincoded git clone --no-checkout https://github.com/ClinGen/clincoded.git .
+- sudo -u clincoded git checkout %(COMMIT)s
+>>>>>>> refs/remotes/ClinGen/dev
 - mkdir /opt/wal-e
 - chown postgres:postgres /opt/wal-e
 - sudo -u postgres virtualenv --python=python2.7 /opt/wal-e
 - sudo -u postgres /opt/wal-e/bin/pip install -r wal-e-requirements.txt
-- /etc/init.d/postgresql stop
-- sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix | tr -d "\n")" backup-fetch /var/lib/postgresql/9.3/main LATEST
-- sudo -u postgres ln -s /etc/postgresql/9.3/main/recovery.conf /var/lib/postgresql/9.3/main/
-- /etc/init.d/postgresql start
-- sudo -u encoded python3.4 bootstrap.py -v 2.3.1 --setuptools-version 15.2
-- sudo -u encoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg
-- sudo -u encoded bin/aws s3 cp --recursive s3://encoded-conf-prod/.aws .aws
+# Restore DB
+# (load data from s3)
+- if test "%(BACKUPDB)s" = "s3_data"
+- then
+-   echo "====== restoring data from backup"
+-   /etc/init.d/postgresql stop
+-   sudo -u postgres /opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.4/main/wale_s3_prefix | tr -d "\n")" backup-fetch /var/lib/postgresql/9.4/main LATEST
+-   sudo -u postgres ln -s /etc/postgresql/9.4/main/recovery.conf /var/lib/postgresql/9.4/main/
+-   /etc/init.d/postgresql start
+# (load local test data plus all genes and diseases)
+- elif test "%(BACKUPDB)s" = "test_gene_and_disease_data"
+- then
+-   echo "====== restoring local test data plus gene and disease data"
+-   sudo -u clincoded psql clincoded < DEV_TEST_DB_DUMP_GENES_9.4
+-   sudo -u clincoded psql -c 'update transactions set xid = NULL'
+- else
+# (load local test data [minimal])
+-   echo "====== restoring local test data"
+-   sudo -u clincoded psql clincoded < DEV_TEST_DB_DUMP_9.4
+-   sudo -u clincoded psql -c 'update transactions set xid = NULL'
+- fi
+- sudo -u clincoded python3.4 bootstrap.py -v 2.3.1 --setuptools-version 15.2
+- sudo -u clincoded LANG=en_US.UTF-8 bin/buildout -c %(ROLE)s.cfg
 - until sudo -u postgres psql postgres -c ""; do sleep 10; done
-- sudo -u encoded sh -c 'cat /dev/urandom | head -c 256 | base64 > session-secret.b64'
-- sudo -u encoded bin/create-mapping production.ini --app-name app
-- ln -s /srv/encoded/etc/encoded-apache.conf /etc/apache2/sites-available/encoded.conf
-- ln -s /srv/encoded/etc/logging-apache.conf /etc/apache2/conf-available/logging.conf
+- sudo -u clincoded sh -c 'cat /dev/urandom | head -c 256 | base64 > session-secret.b64'
+- sudo -u clincoded bin/create-mapping production.ini --app-name app
+- ln -s /srv/clincoded/etc/clincoded-apache.conf /etc/apache2/sites-available/clincoded.conf
+- ln -s /srv/clincoded/etc/logging-apache.conf /etc/apache2/conf-available/logging.conf
 - a2enmod headers
 - a2enmod proxy_http
 - a2enmod rewrite
 - a2enmod ssl
-- a2ensite encoded.conf
+- a2ensite clincoded.conf
 - a2dissite 000-default
 - a2enconf logging
 - a2disconf charset
-- a2disconf javascript-common
+# - a2disconf javascript-common
 - a2disconf localized-error-pages
 - a2disconf other-vhosts-access-log
 - a2disconf serve-cgi-bin
 - if test "%(ROLE)s" = "demo"
 - then
--   sudo -u encoded bin/batchupgrade production.ini --app-name app
+-   sudo -u clincoded bin/batchupgrade production.ini --app-name app
 - fi
 # - sleep 10
-# - sudo -u postgres echo "include 'master.conf'" >> /etc/postgresql/9.3/main/postgresql.conf
-# - pg_ctlcluster 9.3 main reload
-# - pg_ctlcluster 9.3 main promote
-# - sudo -u encoded bin/update-keys-links production.ini --app-name app
-# - sudo -u encoded bin/upgrade production.ini --app-name app
-# - sudo -i -u postgres /opt/wal-e/bin/wal-e --aws-profile default --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix | tr -d "\n")" backup-push /var/lib/postgresql/9.3/main
+# - sudo -u postgres echo "include 'master.conf'" >> /etc/postgresql/9.4/main/postgresql.conf
+# - pg_ctlcluster 9.4 main reload
+# - pg_ctlcluster 9.4 main promote
+# - sudo -u clincoded bin/update-keys-links production.ini --app-name app
+# - sudo -u clincoded bin/upgrade production.ini --app-name app
+# - sudo -i -u postgres /opt/wal-e/bin/wal-e --aws-profile default --s3-prefix="$(cat /etc/postgresql/9.4/main/wale_s3_prefix | tr -d "\n")" backup-push /var/lib/postgresql/9.4/main
 # - sleep 60
+<<<<<<< HEAD
 # - sudo -i -u encoded PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/9.3/bin:$PATH" bin/test -m "not bdd" > tests.out
 
 users:
@@ -165,11 +250,19 @@ users:
   system: true
 - name: encoded
   gecos: ENCODE Metadata Database daemon user
+=======
+# - sudo -i -u clincoded PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/9.4/bin:$PATH" bin/test -m "not bdd" > tests.out
+
+users:
+- default
+- name: clincoded
+  gecos: ClinGen Gene Curation Database daemon user
+>>>>>>> refs/remotes/ClinGen/dev
   inactive: true
   system: true
   # Specified homedir must exist
   # https://github.com/rubygems/rubygems/issues/689
-  homedir: /srv/encoded
+  homedir: /srv/clincoded
 
 write_files:
 - path: /etc/apt/apt.conf.d/20auto-upgrades
@@ -190,9 +283,11 @@ write_files:
 
 - path: /etc/default/elasticsearch
   content: |
-    ES_HEAP_SIZE=4g
+    #TEMP changed to 2g for testing
+    #ES_HEAP_SIZE=4g
+    ES_HEAP_SIZE=2g
 
-- path: /etc/postgresql/9.3/main/custom.conf
+- path: /etc/postgresql/9.4/main/custom.conf
   content: |
     hot_standby = on
     max_standby_archive_delay = -1
@@ -202,23 +297,24 @@ write_files:
     # http://www.postgresql.org/message-id/CAOycyLTm6X3mVLz+sLCex+W==WSMgu9giteV7efPoPXYDhPtzQ@mail.gmail.com
     checkpoint_timeout = 1h
 
-- path: /etc/postgresql/9.3/main/demo.conf
+- path: /etc/postgresql/9.4/main/demo.conf
   content: |
     archive_mode = off
+    hot_standby = off
 
-- path: /etc/postgresql/9.3/main/master.conf
+- path: /etc/postgresql/9.4/main/master.conf
   content: |
-    archive_command = '/opt/wal-e/bin/wal-e --aws-profile default --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix | tr -d "\n")" wal-push "%%p"'
+    archive_command = '/opt/wal-e/bin/wal-e --aws-profile default --s3-prefix="$(cat /etc/postgresql/9.4/main/wale_s3_prefix | tr -d "\n")" wal-push "%%p"'
 
-- path: /etc/postgresql/9.3/main/recovery.conf
+- path: /etc/postgresql/9.4/main/recovery.conf
   content: |
     # recovery.conf must be linked into data dir to do anything
     recovery_target_timeline = 'latest'
-    restore_command = '/opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.3/main/wale_s3_prefix | tr -d "\n")" wal-fetch "%%f" "%%p"'
+    restore_command = '/opt/wal-e/bin/wal-e --aws-instance-profile --s3-prefix="$(cat /etc/postgresql/9.4/main/wale_s3_prefix | tr -d "\n")" wal-fetch "%%f" "%%p"'
     standby_mode = on
 
-- path: /etc/postgresql/9.3/main/wale_s3_prefix
+- path: /etc/postgresql/9.4/main/wale_s3_prefix
   content: "%(WALE_S3_PREFIX)s"
 
 - path: /etc/ssh/users_ca.pub
-  content: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAv/ymOcnN4LhM4NACc3Or116XXJ6KytuOgB/+1qNkOFBqBosrn7cmJ35rsoNHRgYNrCsRE9ch74RKsN6H72FtSJgBhGh/9oUK7Os6Fqt3/ZZXxgxIx6ubs/MTgrxrAnujiBxUXMXQhLKMriNMpo8mt4nGYVtLk9PBjiyfncaS8H9ZKoNio9dhP8bmTuYvioAI35dqKdSlVLyzr/XkZxia8Ki+pQ0N6uuiEwMR3ToM+LSp8wpFOOAiu4PEAujRW7us/+1hlpKWfn0J7/V3826joHE+I967Vg/+ikcVhF77JjK1nib879VgCWfmn1HPQosIpk4yJfVgGvRVI7I2nfBPVw== encoded@demo-l.encodedcc.org
+  content: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmiM5UBd3Rant92xxhCVZFW+U+gUN3aLkICO1gzOGr/Ps173YgzgVPmdKdiI6vBzCZ8BXMG/aeiBHk2LKA+vFjh1/sFRA51nA+hnBzXuIbWYpsTHaGG3BFhnAP8tzDm/7MYRkIeXLwZRwTeFtrMd9MR/HGBVG5HmbM/jtrvTRWZVwFnXRxLQ3Rs5Y9v1QKOrZs4w5tt3iKBiBr+kJKhDHV5O8COowxjcfSqCZmfafVJQNR+8Dg6cvaizqY+ykHpgzc+a7oXJfo1LDDQELl0DGIPDIa340jMDjSSVV0o+RpjbIXTtH4m3TDpKRmZsTQrnHCMNSp5Uk7mMkhKwIwX1SP clincoded-dev@clinicalgenome.org

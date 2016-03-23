@@ -1,0 +1,259 @@
+.form-control {
+    @include border-radius(2px);
+    font-size: 1rem;
+}
+
+.form-std {
+    p {
+        color: #606060;
+    }
+}
+
+.form-create-gene-disease {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.form-error {
+    color: red;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+input[type=text],
+textarea.form-control,
+input[type=password],
+input[type=email],
+input[type=search] {
+    &.error {
+        border: 1px solid red;
+        background-color: #f0d8d0;
+    }
+}
+
+.uppercase-input {
+    text-transform: uppercase;
+}
+
+.form-group-inline {
+    display: inline-block;
+}
+
+.group-age-fromto {
+    display: block;
+    padding-right: 0;
+}
+
+.group-age-input {
+    display: inline-block;
+    width: 45%;
+}
+
+.group-age-inter {
+    display: inline-block;
+    position: relative;
+    top: 9px;
+    width: 10%;
+    vertical-align: top;
+    text-align: center;
+}
+
+.submit-err {
+    margin-right: 10px;
+    line-height: 32px;
+    font-weight: bold;
+    color: #f22;
+    font-size: 0.9rem;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.submit-info {
+    @extend .submit-err;
+    color: #2a2;
+}
+
+// Group and Family Submit Result page styles
+.submit-results-panel {
+    margin: 40px 0;
+
+    &.submit-results-response {
+        margin: -40px 0 40px;
+        border-top: none;
+    }
+}
+
+.submit-results-panel-info {
+    margin: 0;
+    padding-bottom: 0;
+
+    @media screen and (min-width: $screen-sm-min) {
+        padding-bottom: 40px;
+    }
+}
+
+.submit-results-wrapper {
+    display: block;
+    margin: 0 0 20px;
+
+    @media screen and (min-width: $screen-sm-min) {
+        display: table;
+        padding: 5px 0;
+    }
+
+    .form-error {
+        display: none;
+    }
+}
+
+@mixin submit-results-label($width) {
+    display: block;
+    font-size: 1.2rem;
+
+    @media screen and (min-width: $screen-sm-min) {
+        display: table-cell;
+        padding-right: 20px;
+        width: $width;
+        vertical-align: top;
+    }
+}
+
+@mixin submit-results-switch($width) {
+    display: block;
+
+    @media screen and (min-width: $screen-sm-min) {
+        display: table-cell;
+        width: $width;
+        vertical-align: top;
+    }
+}
+
+.group-submit-results-label {
+    @include submit-results-label(60%);
+}
+
+.group-submit-results-switch {
+    @include submit-results-switch(40%);
+}
+
+.family-submit-results-label {
+    @include submit-results-label(60%);
+}
+
+.family-submit-results-switch {
+    @include submit-results-switch(40%);
+}
+
+.group-submit-results-choices {
+    padding-bottom: 0;
+
+    @media screen and (min-width: $screen-md-min) {
+        display: table;
+        padding-bottom: 40px;
+        width: 100%;
+    }
+}
+
+.submit-results-choices-sep {
+    display: block;
+    font-weight: bold;
+    text-align: center;
+
+    @media screen and (min-width: $screen-md-min) {
+        position: relative;
+        top: 5px;
+        display: table-cell;
+        width: 10%;
+        padding: 12px 15px;
+        vertical-align: bottom;
+    }
+}
+
+.family-submit-results-choices {
+    padding-bottom: 0;
+
+    @media screen and (min-width: $screen-md-min) {
+        padding-bottom: 40px;
+    }
+}
+
+.family-submit-results-btn {
+    a {
+        width: 100%;
+    }
+}
+
+
+.group-submit-results-btn {
+    display: block;
+
+    @media screen and (min-width: $screen-md-min) {
+        display: table-cell;
+        width: 45%;
+        vertical-align: bottom;
+    }
+
+    a {
+        width: 100%;
+    }
+}
+
+.submit-results-note {
+    margin: 5px 0;
+    font-size: 0.9;
+    font-style: italic;
+}
+
+.submit-results-buttons {
+    margin-top: -40px;
+    margin-bottom: 40px;
+
+    @media screen and (max-width: 767px) {
+        margin-top: 0;
+    }
+
+    @media screen and (max-width: 1199px) and (min-width: 992px) {
+        .row:last-child .col-md-6 {
+            float: none;
+            margin: 0 auto;
+            text-align: center;
+            width: 55%;
+        }
+    }
+
+    .row {
+        margin: 20px 0;
+    }
+}
+
+.submit-spinner {
+    display: inline-block;
+    opacity: 0;
+    width: 0;
+}
+
+.btn.submit-busy .submit-spinner {
+    opacity: 1;
+    width: auto;
+    padding-right: 5px;
+}
+
+.submit-spinner i {
+    font-size: 15px;
+}
+
+.label-box-match-middle {
+    margin: 0 auto;
+    padding-top: 10px;
+}
+
+.text-no-input {
+    margin-bottom: 0;
+    padding-top: 7px;
+}
+
+.hidden {
+    display: none;
+}
