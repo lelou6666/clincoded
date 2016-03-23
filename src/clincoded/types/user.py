@@ -23,8 +23,8 @@ from contentbase import (
     name='users',
     unique_key='user:email',
     properties={
-        'title': 'DCC Users',
-        'description': 'Listing of current ENCODE DCC users',
+        'title': 'ClinGen Curation Users',
+        'description': 'Listing of current ClinGen Curation users',
     },
     acl=[
         (Allow, 'group.admin', ['list', 'view_details']),
@@ -33,6 +33,7 @@ from contentbase import (
         (Allow, 'remoteuser.INDEXER', ['list', 'view']),
         (Allow, 'remoteuser.EMBED', ['list', 'view']),
         (Allow, Everyone, ['view']),
+        (Allow, 'group.curator', ['view']),
         (Deny, Everyone, ['list', 'view_details']),
     ])
 class User(Item):

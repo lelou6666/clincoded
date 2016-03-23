@@ -17,7 +17,8 @@ import json
 def includeme(config):
     config.scan()
 
-### new collections added for handling curation data, 06/19/2015
+
+# new collections added for handling curation data, 06/19/2015
 @collection(
     name='genes',
     unique_key='gene:symbol',
@@ -29,6 +30,7 @@ class Gene(Item):
     item_type = 'gene'
     schema = load_schema('clincoded:schemas/gene.json')
     name_key = 'symbol'
+
 
 @collection(
     name='diseases',
@@ -83,6 +85,7 @@ class ControlGroup(Item):
     schema = load_schema('clincoded:schemas/controlGroup.json')
     name_key = 'uuid'
 '''
+
 
 @collection(
     name='articles',
@@ -168,8 +171,8 @@ class Gdm(Item):
         'annotations.groups.otherGenes',
         'annotations.groups.otherPMIDs',
         'annotations.groups.otherPMIDs.submitted_by',
-        #'annotations.groups.statistic',
-        #'annotations.groups.statistic.variants',
+        # 'annotations.groups.statistic',
+        # 'annotations.groups.statistic.variants',
         'annotations.groups.familyIncluded',
         'annotations.groups.familyIncluded.associatedGroups',
         'annotations.groups.familyIncluded.commonDiagnosis',
@@ -207,7 +210,7 @@ class Gdm(Item):
         'annotations.groups.individualIncluded.variants.associatedPathogenicities.submitted_by',
         'annotations.groups.individualIncluded.otherPMIDs',
         'annotations.groups.individualIncluded.otherPMIDs.submitted_by',
-        #'annotations.groups.control',
+        # 'annotations.groups.control',
         'annotations.families',
         'annotations.families.associatedGroups',
         'annotations.families.commonDiagnosis',
@@ -251,31 +254,24 @@ class Gdm(Item):
         'annotations.experimentalData.submitted_by',
         'annotations.experimentalData.variants',
         'annotations.experimentalData.variants.associatedPathogenicities',
+<<<<<<< HEAD
+=======
+        'annotations.experimentalData.variants.associatedPathogenicities.associatedGdm',
+>>>>>>> refs/remotes/ClinGen/dev
         'annotations.experimentalData.variants.submitted_by',
+        'annotations.experimentalData.assessments',
+        'annotations.experimentalData.assessments.submitted_by',
         'annotations.experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.genes',
-        'annotations.experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.assessments',
-        'annotations.experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.assessments.submitted_by',
-        'annotations.experimentalData.biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments',
-        'annotations.experimentalData.biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments.submitted_by',
-        'annotations.experimentalData.proteinInteractions.assessments',
-        'annotations.experimentalData.proteinInteractions.assessments.submitted_by',
-        'annotations.experimentalData.expression.normalExpression.assessments',
-        'annotations.experimentalData.expression.normalExpression.assessments.submitted_by',
-        'annotations.experimentalData.expression.alteredExpression.assessments',
-        'annotations.experimentalData.expression.alteredExpression.assessments.submitted_by',
-        'annotations.experimentalData.functionalAlteration.assessments',
-        'annotations.experimentalData.functionalAlteration.assessments.submitted_by',
-        'annotations.experimentalData.modelSystems.assessments',
-        'annotations.experimentalData.modelSystems.assessments.submitted_by',
-        'annotations.experimentalData.rescue.assessments',
-        'annotations.experimentalData.rescue.assessments.submitted_by'
+        'annotations.experimentalData.proteinInteractions.interactingGenes',
+        'annotations.experimentalData.assessments',
+        'annotations.experimentalData.assessments.submitted_by'
     ]
 
     @calculated_property(schema={
-        "title": "Status",
+        "title": "GDM Status",
         "type": "string",
     })
-    def status(self, finalClassification, draftClassification, provisionalClassifications, annotations):
+    def gdm_status(self, finalClassification, draftClassification, provisionalClassifications, annotations):
         if finalClassification != '':
             return 'Final Classification'
         elif draftClassification != '':
@@ -291,7 +287,7 @@ class Gdm(Item):
         "title": "Number of Articles",
         "type": "string",
     })
-    def number_article(seft, annotations):
+    def number_article(self, annotations):
         if len(annotations) > 0:
             return str(len(annotations))
         return ""
@@ -300,7 +296,7 @@ class Gdm(Item):
         "title": "Number of Pathogenicity",
         "type": "string",
     })
-    def number_pathogenicity(seft, variantPathogenicity):
+    def number_pathogenicity(self, variantPathogenicity):
         if len(variantPathogenicity) > 0:
             return str(len(variantPathogenicity))
         return ""
@@ -309,7 +305,7 @@ class Gdm(Item):
         "title": "Number of Provisional",
         "type": "string",
     })
-    def number_provisional(seft, provisionalClassifications):
+    def number_provisional(self, provisionalClassifications):
         if len(provisionalClassifications) > 0:
             return str(len(provisionalClassifications))
         return ""
@@ -318,7 +314,7 @@ class Gdm(Item):
         "title": "GDM",
         "type": "string",
     })
-    def gdm_title(seft, gene, disease, modeCode):
+    def gdm_title(self, gene, disease, modeCode):
         gene_symbol = gene.replace('/genes/', '').replace('/', '')
         orpha_id = disease.replace('/diseases/', '').replace('/', '')
         return gene_symbol + '-' + orpha_id + '-' + modeCode
@@ -367,7 +363,7 @@ class Annotation(Item):
         'groups.individualIncluded.variants.submitted_by',
         'groups.individualIncluded.otherPMIDs',
         'groups.individualIncluded.otherPMIDs.submitted_by',
-        #'groups.control',
+        # 'groups.control',
         'families',
         'families.associatedGroups',
         'families.commonDiagnosis',
@@ -399,29 +395,31 @@ class Annotation(Item):
         'experimentalData.variants',
         'experimentalData.variants.submitted_by',
         'experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.genes',
-        'experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.assessments',
-        'experimentalData.biochemicalFunction.geneWithSameFunctionSameDisease.assessments.submitted_by',
-        'experimentalData.biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments',
-        'experimentalData.biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments.submitted_by',
-        'experimentalData.proteinInteractions.assessments',
-        'experimentalData.proteinInteractions.assessments.submitted_by',
-        'experimentalData.expression.normalExpression.assessments',
-        'experimentalData.expression.normalExpression.assessments.submitted_by',
-        'experimentalData.expression.alteredExpression.assessments',
-        'experimentalData.expression.alteredExpression.assessments.submitted_by',
-        'experimentalData.functionalAlteration.assessments',
-        'experimentalData.functionalAlteration.assessments.submitted_by',
-        'experimentalData.modelSystems.assessments',
-        'experimentalData.modelSystems.assessments.submitted_by',
-        'experimentalData.rescue.assessments',
-        'experimentalData.rescue.assessments.submitted_by'
+        'experimentalData.proteinInteractions.interactingGenes',
+        'associatedGdm',
+        'experimentalData.assessments',
+        'experimentalData.assessments.submitted_by'
     ]
+    rev = {
+        'associatedGdm': ('gdm', 'annotations')
+    }
+
+    @calculated_property(schema={
+        "title": "Associated gdm",
+        "type": "array",
+        "items": {
+            "type": ['string', 'object'],
+            "linkFrom": "gdm.annotations",
+        },
+    })
+    def associatedGdm(self, request, associatedGdm):
+        return paths_filtered_by_status(request, associatedGdm)
 
     @calculated_property(schema={
         "title": "Number of Group",
         "type": "string",
     })
-    def number_group(selft, groups):
+    def number_group(self, groups):
         if len(groups) > 0:
             return len(groups)
         return ""
@@ -430,7 +428,7 @@ class Annotation(Item):
         "title": "Number of Family",
         "type": "string",
     })
-    def number_family(selft, families):
+    def number_family(self, families):
         if len(families) > 0:
             return len(families)
         return ""
@@ -439,7 +437,7 @@ class Annotation(Item):
         "title": "Number of Provisioinal Individual",
         "type": "string",
     })
-    def number_individual(selft, individuals):
+    def number_individual(self, individuals):
         if len(individuals) > 0:
             return len(individuals)
         return ""
@@ -496,7 +494,10 @@ class Group(Item):
         'individualIncluded.variants',
         'individualIncluded.variants.submitted_by',
         'associatedAnnotations',
-        'associatedAnnotations.article'
+        'associatedAnnotations.article',
+        'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
         #'control'
     ]
     rev = {
@@ -513,6 +514,7 @@ class Group(Item):
     })
     def associatedAnnotations(self, request, associatedAnnotations):
         return paths_filtered_by_status(request, associatedAnnotations)
+
 
 @collection(
     name='families',
@@ -546,8 +548,14 @@ class Family(Item):
         'associatedGroups.commonDiagnosis',
         'associatedGroups.associatedAnnotations',
         'associatedGroups.associatedAnnotations.article',
+        'associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedAnnotations',
         'associatedAnnotations.article',
+        'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
     ]
     rev = {
         'associatedGroups': ('group', 'familyIncluded'),
@@ -599,15 +607,27 @@ class Individual(Item):
         'associatedGroups.commonDiagnosis',
         'associatedGroups.associatedAnnotations',
         'associatedGroups.associatedAnnotations.article',
+        'associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies',
         'associatedFamilies.associatedGroups',
         'associatedFamilies.associatedGroups.associatedAnnotations',
         'associatedFamilies.associatedGroups.associatedAnnotations.article',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies.associatedAnnotations',
         'associatedFamilies.associatedAnnotations.article',
+        'associatedFamilies.associatedAnnotations.associatedGdm',
+        'associatedFamilies.associatedAnnotations.associatedGdm.disease',
+        'associatedFamilies.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies.commonDiagnosis',
         'associatedAnnotations',
-        'associatedAnnotations.article'
+        'associatedAnnotations.article',
+        'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
     ]
     rev = {
         'associatedGroups': ('group', 'individualIncluded'),
@@ -648,6 +668,16 @@ class Individual(Item):
     def associatedAnnotations(self, request, associatedAnnotations):
         return paths_filtered_by_status(request, associatedAnnotations)
 
+    @calculated_property(schema={
+        "title": "Proband String",
+        "type": "string"
+    })
+    def is_proband(self, proband):
+        if proband:
+            return 'Yes'
+        else:
+            return 'No'
+
 
 @collection(
     name='experimental',
@@ -665,24 +695,29 @@ class Experimental(Item):
         'variants',
         'variants.submitted_by',
         'biochemicalFunction.geneWithSameFunctionSameDisease.genes',
-        'biochemicalFunction.geneWithSameFunctionSameDisease.assessments',
-        'biochemicalFunction.geneWithSameFunctionSameDisease.assessments.submitted_by',
-        'biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments',
-        'biochemicalFunction.geneFunctionConsistentWithPhenotype.assessments.submitted_by',
         'proteinInteractions.interactingGenes',
-        'proteinInteractions.assessments',
-        'proteinInteractions.assessments.submitted_by',
-        'expression.normalExpression.assessments',
-        'expression.normalExpression.assessments.submitted_by',
-        'expression.alteredExpression.assessments',
-        'expression.alteredExpression.assessments.submitted_by',
-        'functionalAlteration.assessments',
-        'functionalAlteration.assessments.submitted_by',
-        'modelSystems.assessments',
-        'modelSystems.assessments.submitted_by',
-        'rescue.assessments',
-        'rescue.assessments.submitted_by'
+        'associatedAnnotations',
+        'associatedAnnotations.article',
+        'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene',
+        'assessments',
+        'assessments.submitted_by'
     ]
+    rev = {
+        'associatedAnnotations': ('annotation', 'experimentalData')
+    }
+
+    @calculated_property(schema={
+        "title": "Associated annotations",
+        "type": "array",
+        "items": {
+            "type": ['string', 'object'],
+            "linkFrom": "annotation.experimentalData",
+        },
+    })
+    def associatedAnnotations(self, request, associatedAnnotations):
+        return paths_filtered_by_status(request, associatedAnnotations)
 
 
 @collection(
@@ -699,6 +734,7 @@ class Pathogenicity(Item):
     embedded = [
         'submitted_by',
         'variant',
+        'variant.submitted_by',
         'variant.associatedPathogenicities',
         'variant.associatedPathogenicities.assessments',
         'variant.associatedPathogenicities.assessments.submitted_by',
@@ -725,7 +761,9 @@ class Pathogenicity(Item):
         "type": "integer"
     })
     def numberOfAssessment(self, assessments):
-        return len(assessments)
+        if len(assessments) > 0:
+            return len(assessments)
+        return ''
 
 
 @collection(
@@ -742,9 +780,11 @@ class Assessment(Item):
     embedded = [
         'submitted_by',
         'pathogenicity_assessed',
+        'experimental_assessed',
     ]
     rev = {
         'pathogenicity_assessed': ('pathogenicity', 'assessments'),
+        'experimental_assessed': ('experimental', 'assessments')
     }
 
     @calculated_property(schema={
@@ -754,6 +794,14 @@ class Assessment(Item):
     })
     def pathogenicity_assessed(self, request, pathogenicity_assessed):
         return paths_filtered_by_status(request, pathogenicity_assessed)
+
+    @calculated_property(schema={
+        "title": "Experimental Assessed",
+        "type": ["string", "object"],
+        "linkFrom": "experimental.assessments"
+    })
+    def experimental_assessed(self, request, experimental_assessed):
+        return paths_filtered_by_status(request, experimental_assessed)
 
 
 @collection(
@@ -789,8 +837,8 @@ class Provisional(Item):
     name='labs',
     unique_key='lab:name',
     properties={
-        'title': 'Labs',
-        'description': 'Listing of ENCODE DCC labs',
+        'title': 'Groups',
+        'description': 'Listing of ClinGen Curation Groups',
     })
 class Lab(Item):
     item_type = 'lab'
@@ -830,7 +878,7 @@ class Organism(Item):
     unique_key='source:name',
     properties={
         'title': 'Sources',
-        'description': 'Listing of sources and vendors for ENCODE material',
+        'description': 'Listing of sources and vendors for ClinGen Curation',
     })
 class Source(Item):
     item_type = 'source'
@@ -848,3 +896,51 @@ class Document(ItemWithAttachment, Item):
     item_type = 'document'
     schema = load_schema('clincoded:schemas/document.json')
     embedded = ['lab', 'award', 'submitted_by']
+
+@collection(
+    name='histories',
+    properties={
+        'title': "Curation operation history",
+        'description': 'History of curator operations',
+    })
+class History(Item):
+    item_type = 'history'
+    schema = load_schema('clincoded:schemas/curatorHistory.json')
+    embedded = [
+        'primary',
+        'meta.gdm.gene',
+        'meta.gdm.disease',
+        'meta.article.gdm',
+        'meta.article.gdm.gene',
+        'meta.article.gdm.disease',
+        'meta.group.gdm',
+        'meta.group.gdm.gene',
+        'meta.group.gdm.disease',
+        'meta.group.article',
+        'meta.family.gdm',
+        'meta.family.gdm.gene',
+        'meta.family.gdm.disease',
+        'meta.family.group',
+        'meta.family.article',
+        'meta.individual.gdm',
+        'meta.individual.gdm.gene',
+        'meta.individual.gdm.disease',
+        'meta.individual.group',
+        'meta.individual.family',
+        'meta.individual.article',
+        'meta.experimental.gdm',
+        'meta.experimental.gdm.gene',
+        'meta.experimental.gdm.disease',
+        'meta.experimental.article',
+        'meta.provisionalClassification.gdm',
+        'meta.provisionalClassification.gdm.gene',
+        'meta.provisionalClassification.gdm.disease',
+        'meta.pathogenicity.variant',
+        'meta.pathogenicity.gdm',
+        'meta.assessment.gdm',
+        'meta.assessment.experimental',
+        'meta.assessment.family',
+        'meta.assessment.pathogenicity',
+        'meta.assessment.variant',
+        'submitted_by',
+    ]

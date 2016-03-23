@@ -26,7 +26,7 @@ var ExperimentalSubmit = React.createClass({
         return {
             gdm: null, // GDM object given in query string
             experimental: null, // Experimental object given in query string
-            annotation: null, // Annotation object given in query string
+            annotation: null // Annotation object given in query string
         };
     },
 
@@ -91,6 +91,7 @@ var ExperimentalSubmit = React.createClass({
         var gdm = this.state.gdm;
         var experimental = this.state.experimental;
         var annotation = this.state.annotation;
+        var session = (this.props.session && Object.keys(this.props.session).length) ? this.props.session : null;
 
         // Get the query strings. Have to do this now so we know whether to render the form or not. The form
         // uses React controlled inputs, so we can only render them the first time if we already have the
@@ -104,15 +105,15 @@ var ExperimentalSubmit = React.createClass({
 
         return (
             <div>
-                <RecordHeader gdm={gdm} omimId={gdm && gdm.omimId} />
+                <RecordHeader gdm={gdm} omimId={gdm && gdm.omimId} session={session} linkGdm={true} pmid={annotation ? annotation.article.pmid : null} />
                 <div className="container">
-                    {experimental ?
-                        <h1>{experimental.evidenceType}<br />Experimental Data Information: {experimental.label} <a href={experimental['@id']} className="btn btn-info" target="_blank">View</a>&nbsp;<a href={editExperimentalLink} className="btn btn-info">Edit</a></h1>
-                    : null}
                     {annotation && annotation.article ?
                         <div className="curation-pmid-summary">
                             <PmidSummary article={annotation.article} displayJournal />
                         </div>
+                    : null}
+                    {experimental ?
+                        <h1>{experimental.evidenceType}<br />Experimental Data Information: {experimental.label} <a href={editExperimentalLink} className="btn btn-info">Edit/Assess</a></h1>
                     : null}
                     <div className="row">
                         <div className="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
@@ -126,14 +127,14 @@ var ExperimentalSubmit = React.createClass({
                                     <div className="family-submit-results-choices">
                                         <div className="submit-results-panel-info"></div>
                                         <div className="submit-results-buttons">
-                                            <div className="col-md-7">
+                                            <div className="col-md-6">
                                                 <span className="family-submit-results-btn">
                                                     <a className="btn btn-default" href={'/experimental-curation/?gdm=' + gdm.uuid + '&evidence=' + annotation.uuid}>Add another Experimental Data entry</a>
                                                 </span>
                                             </div>
-                                            <div className="col-md-5">
+                                            <div className="col-md-6">
                                                 <span className="family-submit-results-btn">
-                                                    <a className="btn btn-default" href={'/curation-central/?gdm=' + gdm.uuid + '&pmid=' + annotation.article.pmid}>Return to Record Curation page</a>
+                                                    <a className="btn btn-default" href={'/curation-central/?gdm=' + gdm.uuid + '&pmid=' + annotation.article.pmid}>Return to Record Curation page <i className="icon icon-briefcase"></i></a>
                                                 </span>
                                             </div>
                                         </div>
