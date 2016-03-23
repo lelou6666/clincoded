@@ -3,27 +3,23 @@
     "description": "Schema for storing and using experimental data.",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["owner", "dateTime", "evidenceType"],
+    "required": ["evidenceType"],
     "identifyingProperties": ["uuid"],
     "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" }
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/standard_status" }
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
-        "owner": {
-            "title": "Owner",
-            "description": "Email of curator who create the experimental data",
+        "label": {
+            "title": "Label",
+            "description": "A user entered label for the experiment",
             "type": "string"
-        },
-        "dateTime": {
-            "title": "Date Time",
-            "description": "Date and time to create the experimental data",
-            "type": "string",
-            "format": "date-time"
         },
         "active": {
             "title": "Active",
@@ -36,11 +32,11 @@
             "description": "One of six evidence types",
             "type": "string",
             "enum": [
-                "Biochemical function",
+                "Biochemical Function",
                 "Protein Interactions",
                 "Expression",
-                "Functional alteration of gene/gene product",
-                "Model systems",
+                "Functional Alteration",
+                "Model Systems",
                 "Rescue"
             ]
         },
@@ -60,11 +56,10 @@
                     "description": "Evidence for function (required)",
                     "type": "string"
                 },
-                "evidenceForFunctionInPapaer": {
+                "evidenceForFunctionInPaper": {
                     "title": "Evidence Location in Article",
                     "description": "Where in article to find evidence",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "geneWithSameFunctionSameDisease": {
                     "title": "Option A",
@@ -87,28 +82,20 @@
                             "description": "Evidence for other genes (required)",
                             "type": "string"
                         },
+                        "geneImplicatedWithDisease": {
+                            "title": "Gene implicated in the disease",
+                            "description": "Has this gene or genes been implicated in the above disease",
+                            "type": "boolean"
+                        },
                         "explanationOfOtherGenes": {
                             "title": "Explanation of Other Genes",
                             "description": "Explanation of relationship of other genes to the diasease  (optional)",
-                            "type": "string",
-                            "default": ""
+                            "type": "string"
                         },
                         "evidenceInPaper": {
                             "title": "Explanation in Paper",
                             "description": "Where explanation can be found in paper (optional)",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "assessments": {
-                            "title": "Assessments",
-                            "description": "List of assessments",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "title": "Assessment",
-                                "type": "string",
-                                "linkTo": "assessment"
-                            }
+                            "type": "string"
                         }
                     }
                 },
@@ -132,8 +119,7 @@
                         "phenotypeFreeText": {
                             "title": "Phenotype (Free Text)",
                             "description": "Free text if HPO is not avaliable for the phenotype",
-                            "type": "string",
-                            "default": ""
+                            "type": "string"
                         },
                         "explanation": {
                             "title": "Consistent with Disease",
@@ -143,25 +129,13 @@
                         "evidenceInPaper": {
                             "title": "Consistent in Paper",
                             "description": "Where to find the explantion in paper",
-                            "type": "string",
-                            "default": ""
-                        },
-                        "assessments": {
-                            "title": "Assessments",
-                            "description": "List of assessments",
-                            "type": "array",
-                            "default": [],
-                            "items": {
-                                "title": "Assessment",
-                                "type": "string",
-                                "linkTo": "assessment"
-                            }
+                            "type": "string"
                         }
                     }
                 }
             }
         },
-        "proteinIneractions": {
+        "proteinInteractions": {
             "title": "Interactions",
             "description": "Items in interactions type",
             "type": "object",
@@ -194,13 +168,15 @@
                     "description": "Experimental Interaction Detection",
                     "type": "string",
                     "enum": [
-                        "coimmunoprecipitation (M:0019)",
-                        "pull down (M:0096)",
-                        "affinity chromatography technology (M:0004)",
-                        "protein cross-linking with a bifunctional reagent (M0031)",
-                        "comigration in gel electrophoresis (M:0807)",
-                        "x-ray crystallography (MI:0114)",
-                        "electron microscopy (MI:0040)"
+                        "affinity chromatography technology (MI:0004)",
+                        "coimmunoprecipitation (MI:0019)",
+                        "comigration in gel electrophoresis (MI:0807)",
+                        "electron microscopy (MI:0040)",
+                        "protein cross-linking with a bifunctional reagent (MI:0031)",
+                        "pull down (MI:0096)",
+                        "synthetic genetic analysis (MI:0441)",
+                        "two hybrid (MI:0018)",
+                        "x-ray crystallography (MI:0114)"
                     ]
                 },
                 "geneImplicatedInDisease": {
@@ -217,16 +193,6 @@
                     "title": "Evidence in Paper",
                     "description": "Where evidence can be found in paper",
                     "type": "string"
-                },
-                "assessments": {
-                    "title": "Assessments",
-                    "description": "List of assessments",
-                    "type": "array",
-                    "items": {
-                        "title": "Assessment uuid",
-                        "type": "string",
-                        "linkTo": "assessment"
-                    }
                 }
             }
         },
@@ -247,6 +213,11 @@
                     "type": "object",
                     "default": {},
                     "properties": {
+                        "expressedInTissue": {
+                            "title": "Is gene normally expressed in tissue",
+                            "description": "Is the gene normally expressed in the tissue",
+                            "type": "boolean"
+                        },
                         "evidence": {
                             "title": "Evidence for Normal Expression",
                             "description": "Evidence for normal expression in tissue",
@@ -256,16 +227,6 @@
                             "title": "Evidence in Paper",
                             "description": "Where evidence can be found in paper",
                             "type": "string"
-                        },
-                        "assessments": {
-                            "title": "Assessments",
-                            "description": "List of assessment",
-                            "type": "array",
-                            "items": {
-                                "title": "Assessment",
-                                "type": "string",
-                                "linkTo": "assessment"
-                            }
                         }
                     }
                 },
@@ -275,6 +236,11 @@
                     "type": "object",
                     "default": {},
                     "properties": {
+                        "expressedInPatients": {
+                            "title": "Is expression altered in patients with disease",
+                            "description": "Is expression altered in patients who have the disease",
+                            "type": "boolean"
+                        },
                         "evidence": {
                             "title": "Evidence for Altered Expression",
                             "description": "Evidence for altered expression in patients",
@@ -284,22 +250,12 @@
                             "title": "Evidence Location in Paper",
                             "description": "Information about where evidence can be found in paper",
                             "type": "string"
-                        },
-                        "assessments": {
-                            "title": "Assessments",
-                            "description": "List of assessments",
-                            "type": "array",
-                            "items": {
-                                "title": "Assessment uuid",
-                                "type": "string",
-                                "linkTo": "assessment"
-                            }
                         }
                     }
                 }
             }
         },
-        "functionalAleration": {
+        "functionalAlteration": {
             "title": "Functional Alteration",
             "description": "Items in Functional Alteration type",
             "type": "object",
@@ -324,7 +280,7 @@
                     "description": "EFO terms",
                     "type": "string"
                 },
-                "descriptoinOfGeneAlteration": {
+                "descriptionOfGeneAlteration": {
                     "title": "Gene Alteration",
                     "description": "Description of gene alteration in engineered equivalent",
                     "type": "string"
@@ -342,18 +298,7 @@
                 "evidenceInPaper": {
                     "title": "Evidence in Paper",
                     "description": "Where evidence can be found in paper",
-                    "type": "string",
-                    "default": ""
-                },
-                "assessments": {
-                    "title": "Assessments",
-                    "description": "List of assessments",
-                    "type": "array",
-                    "items": {
-                        "title": "Assessment uuid",
-                        "type": "string",
-                        "linkTo": "assessment"
-                    }
+                    "type": "string"
                 }
             }
         },
@@ -376,7 +321,6 @@
                     "title": "Animal Model",
                     "description": "NCBI Taxon id for animal model",
                     "type": "string",
-                    "default": "",
                     "enum": [
                         "",
                         "Cat (Felis catus) 9685",
@@ -402,8 +346,7 @@
                 "cellCulture": {
                     "title": "Cell Culture Type/Line",
                     "description": "EFO id for cell culture type/line",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "descriptionOfGeneAlteration": {
                     "title": "Gene Alteration",
@@ -413,26 +356,22 @@
                 "phenotypeHPO": {
                     "title": "Phenotype (HPO)",
                     "description": "HPO id of patient phenotype",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "phenotypeFreeText": {
                     "title": "Phenotype (Free text)",
                     "description": "Other terms of phenotype if HPO not avaliable",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "phenotypeHPOObserved": {
                     "title": "Phenotype (HPO) Observed in Model System",
                     "description": "HPO term",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "phenotypeFreetextObserved": {
                     "title": "Phenotype (Free text) Observed in Model System",
                     "description": "Free text",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "explanation": {
                     "title": "Explanation",
@@ -440,20 +379,9 @@
                     "type": "string"
                 },
                 "evidenceInPaper": {
-                    "title": "Evidence in Papaer",
+                    "title": "Evidence in Paper",
                     "description": "Where evidence can be found in paper",
-                    "type": "string",
-                    "default": ""
-                },
-                "assessments": {
-                    "title": "Assessments",
-                    "description": "List of assessments",
-                    "type": "array",
-                    "items": {
-                        "title": "Assessment uuid",
-                        "type": "string",
-                        "linkTo": "assessment"
-                    }
+                    "type": "string"
                 }
             }
         },
@@ -517,21 +445,10 @@
                     "description": "Explanation",
                     "type": "string"
                 },
-                "evidenceLocationInPaper": {
+                "evidenceInPaper": {
                     "title": "Evidence Location in Paper",
                     "description": "Where can evidence be found in paper",
-                    "type": "string",
-                    "default": ""
-                },
-                "assessments": {
-                    "title": "Assessments",
-                    "description": "List of assessments",
-                    "type": "array",
-                    "items": {
-                        "title": "Assessment uuid",
-                        "type": "string",
-                        "linkTo": "assessment"
-                    }
+                    "type": "string"
                 }
             }
         },
@@ -545,20 +462,42 @@
                 "type": "string",
                 "linkTo": "variant"
             }
+        },
+        "assessments": {
+            "title": "Assessments",
+            "description": "List of assessments added from different curators",
+            "type": "array",
+            "default": [],
+            "items": {
+                "description": "Assessment from one curator",
+                "type": "string",
+                "linkTo": "assessment"
+            }
         }
     },
     "columns": {
+        "label": {
+            "title": "Label",
+            "type": "string"
+        },
         "uuid": {
             "title": "ExperimentalData",
             "type": "string"
         },
-        "owner": {
-            "title": "Owner",
+        "date_created": {
+            "title": "Creation Date",
             "type": "string"
         },
         "evidenceType": {
             "title": "Type",
             "type": "string"
+        },
+        "submitted_by.uuid": {
+            "title": "Submitted by",
+            "type": "string"
         }
+    },
+    "boost_values": {
+        "evidenceType": 1.0
     }
 }

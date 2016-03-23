@@ -1,5 +1,8 @@
 'use strict';
 var React = require('react');
+var globals = require('./globals');
+
+var addQueryKey = globals.addQueryKey;
 
 
 // Mixin to use REST APIs conveniently. In this project, this is mostly used to read or write data
@@ -37,9 +40,19 @@ var RestMixin = module.exports.RestMixin = {
         });
     },
 
+    // use getRestDataXml to get an array of XML responses from an array of URIs
+    getRestDatasXml: function(uris) {
+        return Promise.all(uris.map(function(uri, i) {
+            return this.getRestDataXml(uri, function() {});
+        }.bind(this)));
+    },
+
     // GET JSON data from the given URI. Returns data in the promise.
     // Non-OK error response calls the optional errorHandler function.
-    getRestData: function(uri, errorHandler) {
+    getRestData: function(uri, errorHandler, dbSearch) {
+        if (dbSearch) {
+            uri = addQueryKey(uri, 'datastore', 'database');
+        }
         return this.context.fetch(uri, {
             method: 'GET',
             headers: {'Accept': 'application/json'}
@@ -58,10 +71,10 @@ var RestMixin = module.exports.RestMixin = {
     // Get JSON data from the given URIs (in an array), and return a promise once all GET REST requests
     // have succeeded. Optionally, if any GET requests fail, call the corresponding function in the
     // 'handlers' array.
-    getRestDatas: function(uris, handlers) {
+    getRestDatas: function(uris, handlers, dbSearch) {
         return Promise.all(uris.map(function(uri, i) {
             var handler = (handlers && handlers.length) ? handlers[i] : null;
-            return this.getRestData(uri, handler);
+            return this.getRestData(uri, handler, dbSearch);
         }.bind(this)));
     },
 
@@ -73,6 +86,14 @@ var RestMixin = module.exports.RestMixin = {
     // POST given object to the given URI. Returns written data as a promise.
     postRestData: function(uri, obj) {
         return this.writeRestData(uri, obj, 'POST');
+    },
+
+    // Post the objects in the 'objs' array to given URI (so all objects have to be the same type).
+    // Might want to later expand this to optionally take an array of uris.
+    postRestDatas: function(uri, objs) {
+        return Promise.all(objs.map(obj => {
+            return this.postRestData(uri, obj);
+        }));
     },
 
     // Not for use by client components

@@ -6,23 +6,19 @@
     "type": "object",
     "required": [
         "label",
-        "commonDiagnosis",
-        "totalNumberIndividuals",
-        "numberOfIndividualsWithFamilyInformation",
-        "numberOfIndividualsWithoutFamilyInformation",
-        "numberOfIndividualsWithVariantInCuratedGene",
-        "numberOfIndividualsWithoutVariantInCuratedGene"
+        "totalNumberIndividuals"
     ],
     "identifyingProperties": ["uuid"],
     "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/shared_status" }
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/standard_status" }
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "3"
         },
         "label": {
             "title": "Label",
@@ -209,10 +205,79 @@
             }
         },
         "method": {
-            "title": "Method",
-            "description": "Mothed id",
-            "type": "string",
-            "linkTo": "method"
+            "title": "Group Method",
+            "type": "object",
+            "default": {},
+            "properties": {
+                "previousTesting": {
+                    "title": "Previous Testing",
+                    "description": "Previous testing",
+                    "type": "boolean"
+                },
+                "previousTestingDescription": {
+                    "title": "Previous Testing",
+                    "description": "Previous testing",
+                    "type": "string",
+                    "default": ""
+                },
+                "genomeWideStudy": {
+                    "title": "Genome-Wide Study",
+                    "description": "Genome-wide study",
+                    "type": "boolean"
+                },
+                "genotypingMethods": {
+                    "title": "Genotyping Method(s)",
+                    "description": "List of genotyping methods",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "title": "Genotyping Method",
+                        "description": "Genotyping method",
+                        "type": "string",
+                        "enum": [
+                            "Exome sequencing",
+                            "Genotyping",
+                            "High resolution melting",
+                            "PCR",
+                            "Sanger sequencing",
+                            "Whole genome shotgun sequencing"
+                        ]
+                    }
+                },
+                "entireGeneSequenced": {
+                    "title": "Entire Gene Sequenced",
+                    "description": "Entire gene sequenced",
+                    "type": "boolean"
+                },
+                "copyNumberAssessed": {
+                    "title": "Copy Number Assessed",
+                    "description": "Copy number assessed",
+                    "type": "boolean"
+                },
+                "specificMutationsGenotyped": {
+                    "title": "Copy Number Assessed",
+                    "description": "Copy number assessed",
+                    "type": "boolean"
+                },
+                "specificMutationsGenotypedMethod": {
+                    "title": "Specific Mutations Genotyped Method",
+                    "description": "Method by which specific mutations genotyped",
+                    "type": "string",
+                    "default": ""
+                },
+                "additionalInformation": {
+                    "title": "Additional Information",
+                    "description": "Additional information",
+                    "type": "string",
+                    "default": ""
+                },
+                "dateTime": {
+                    "title": "Date Time",
+                    "description": "Time stamp for creation",
+                    "type": "string",
+                    "default": ""
+                }
+            }
         },
         "additionalInformation": {
             "title": "Additional Information",
@@ -268,12 +333,10 @@
             "type": "string",
             "linkTo": "controlGroup"
         },
-        "dateTime": {
-            "title": "Time Stamp",
-            "description": "Time stamp of the group creation",
-            "type": "string",
-            "format": "date-time",
-            "default": ""
+        "active": {
+            "description": "boolean switch to set if the group avaliable for curation.",
+            "type": "boolean",
+            "default": true
         }
     },
     "columns": {
@@ -281,20 +344,20 @@
             "title": "Label",
             "type": "string"
         },
-        "commonDiagnosis": {
-            "title": "Common Diagnosis",
+        "date_created": {
+            "title": "Creation Date",
             "type": "string"
         },
         "totalNumberIndividuals": {
             "title": "Total Number Individuals",
             "type": "integer"
         },
-        "familyIncluded": {
-            "title": "Family Included",
+        "submitted_by.title": {
+            "title": "Submitted by",
             "type": "string"
         },
-        "individualIncluded": {
-            "title": "Individual Included",
+        "date_created": {
+            "title": "Creation Date",
             "type": "string"
         }
     }

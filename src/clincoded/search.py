@@ -68,7 +68,7 @@ def get_sort_order():
     specifies sort order for elasticsearch results
     """
     return {
-        'embedded.dateTime': {
+        'embedded.date_created': {
             'order': 'desc',
             'ignore_unmapped': True,
         }
@@ -364,12 +364,12 @@ def search(context, request, search_type=None):
         del query['query']['query_string']
     elif len(doc_types) != 1:
         del query['query']['query_string']['fields']
-    elif size <= 25:
-        # highlight only when search type, search term and size are specified
-        query['highlight'] = {
-            'order': 'score',
-            'fields': highlights
-        }
+    # elif size <= 25:
+    #     # highlight only when search type, search term and size are specified
+    #     query['highlight'] = {
+    #         'order': 'score',
+    #         'fields': highlights
+    #     }
 
     # Setting filters
     used_filters = set_filters(request, query, result)

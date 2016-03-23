@@ -4,17 +4,18 @@
     "description": "Schema for storing and using individual data",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["label", "diagnosis"],
+    "required": ["label"],
     "identifyingProperties": ["uuid"],
     "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/shared_status" }
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/standard_status" }
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "3"
         },
         "label": {
             "title": "Label",
@@ -34,8 +35,7 @@
         "sex": {
             "title": "Sex",
             "description": "Sex",
-            "type": "string",
-            "default": ""
+            "type": "string"
         },
         "hpoIdInDiagnosis": {
             "title": "HPO ID(s)",
@@ -51,8 +51,7 @@
         "termsInDiagnosis": {
             "title": "Non-HPO term(s)",
             "description": "Non-HPO terms (separated by comma) for the disease",
-            "type": "string",
-            "default": ""
+            "type": "string"
         },
         "hpoIdInElimination": {
             "title": "HPO ID(s) Eliminated",
@@ -68,31 +67,28 @@
         "termsInElimination": {
             "title": "Non-HPO term(s) Eliminated",
             "description": "Non-HPO terms (separated by comma) eliminated from the disease",
-            "type": "string",
-            "default": ""
+            "type": "string"
         },
         "countryOfOrigin": {
             "title": "Country Of Origin",
             "description": "Country in which the family original live",
-            "type": "string",
-            "default": ""
+            "type": "string"
         },
         "ethnicity": {
             "title": "Ethnicity",
             "description": "Ethnicity",
             "type": "string",
-            "default": "",
             "enum": [
                 "",
                 "Hispanic or Latino",
-                "Not Hispanic or Latino"
+                "Not Hispanic or Latino",
+                "Unknown"
             ]
         },
         "race": {
             "title": "Race",
             "description": "Race",
             "type": "string",
-            "default": "",
             "enum": [
                 "",
                 "American Indian or Alaska Native",
@@ -138,16 +134,84 @@
             ]
         },
         "method": {
-            "title": "Method",
-            "description": "Mothed id",
-            "type": "string",
-            "linkTo": "method"
+            "title": "Individual Method",
+            "type": "object",
+            "default": {},
+            "properties": {
+                "previousTesting": {
+                    "title": "Previous Testing",
+                    "description": "Previous testing",
+                    "type": "boolean"
+                },
+                "previousTestingDescription": {
+                    "title": "Previous Testing",
+                    "description": "Previous testing",
+                    "type": "string",
+                    "default": ""
+                },
+                "genomeWideStudy": {
+                    "title": "Genome-Wide Study",
+                    "description": "Genome-wide study",
+                    "type": "boolean"
+                },
+                "genotypingMethods": {
+                    "title": "Genotyping Method(s)",
+                    "description": "List of genotyping methods",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "title": "Genotyping Method",
+                        "description": "Genotyping method",
+                        "type": "string",
+                        "enum": [
+                            "Exome sequencing",
+                            "Genotyping",
+                            "High resolution melting",
+                            "PCR",
+                            "Sanger sequencing",
+                            "Whole genome shotgun sequencing"
+                        ]
+                    }
+                },
+                "entireGeneSequenced": {
+                    "title": "Entire Gene Sequenced",
+                    "description": "Entire gene sequenced",
+                    "type": "boolean"
+                },
+                "copyNumberAssessed": {
+                    "title": "Copy Number Assessed",
+                    "description": "Copy number assessed",
+                    "type": "boolean"
+                },
+                "specificMutationsGenotyped": {
+                    "title": "Copy Number Assessed",
+                    "description": "Copy number assessed",
+                    "type": "boolean"
+                },
+                "specificMutationsGenotypedMethod": {
+                    "title": "Specific Mutations Genotyped Method",
+                    "description": "Method by which specific mutations genotyped",
+                    "type": "string",
+                    "default": ""
+                },
+                "additionalInformation": {
+                    "title": "Additional Information",
+                    "description": "Additional information",
+                    "type": "string",
+                    "default": ""
+                },
+                "dateTime": {
+                    "title": "Date Time",
+                    "description": "Time stamp for creation",
+                    "type": "string",
+                    "default": ""
+                }
+            }
         },
         "additionalInformation": {
             "title": "Additional Information",
             "description": "List of Additional information for the individual",
-            "type": "string",
-            "default": ""
+            "type": "string"
         },
         "otherPMIDs": {
             "title": "Other PMIDs",
@@ -179,12 +243,10 @@
             "type": "boolean",
             "default": false
         },
-        "dateTime": {
-            "title": "Date and Time",
-            "description": "Time stamp of the individual creation",
-            "type": "string",
-            "format": "date-time",
-            "default": ""
+        "active": {
+            "description": "boolean switch to set if the individual avaliable for curation.",
+            "type": "boolean",
+            "default": true
         }
     },
     "columns": {
@@ -192,25 +254,21 @@
             "title": "Label",
             "type": "string"
         },
-        "diagnosis": {
-            "title": "Diagnosis",
+        "is_proband": {
+            "title": "Probands",
             "type": "string"
         },
-        "sex": {
-            "title": "Sex",
+        "submitted_by.title": {
+            "title": "Creator",
             "type": "string"
         },
-        "race": {
-            "title": "Race",
+        "date_created": {
+            "title": "Creation Date",
             "type": "string"
         },
-        "variants": {
-            "title": "Variants Associated",
+        "last_modified": {
+            "title": "Last Modified",
             "type": "string"
-        },
-        "proband": {
-            "title": "Proband",
-            "type": "boolean"
         }
     }
 }
