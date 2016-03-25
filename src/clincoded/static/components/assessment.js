@@ -1,9 +1,11 @@
 'use strict';
 var React = require('react');
 var _ = require('underscore');
+var moment = require('moment');
 var curator = require('./curator');
 var panel = require('../libs/bootstrap/panel');
 var form = require('../libs/bootstrap/form');
+var globals = require('./globals');
 
 var Panel = panel.Panel;
 var Form = form.Form;
@@ -13,6 +15,14 @@ var InputMixin = form.InputMixin;
 
 var DEFAULT_VALUE = module.exports.DEFAULT_VALUE = 'Not Assessed';
 
+var experimentalTypes = [
+    'Biochemical Function',
+    'Protein Interactions',
+    'Expression',
+    'Functional Alteration',
+    'Model Systems',
+    'Rescue'
+];
 
 // Object to track and maintain a single assessment. If you pass null/undefined in 'assessment',
 // provide all parameters from 'gdm' and after to properly initialize new assessment, if possible.
@@ -88,8 +98,9 @@ var AssessmentMixin = module.exports.AssessmentMixin = {
     // an existing assessment, pass that in the 'assessment' parameter. This is useful for when you've written the
     // assessment without an evidence_id, but now have it. In that case, pass the assessment tracker, null for the
     // GDM (use the existing one), the evidence object, and the assessment object to write with the new evidence ID.
-    saveAssessment: function(assessmentTracker, gdmUuid, evidenceUuid, assessment) {
+    saveAssessment: function(assessmentTracker, gdmUuid, evidenceUuid, assessment, historyLabel) {
         // Flatten the original assessment if any; will modify with updated values
+        //var newAssessment = assessment ? curator.flatten(assessment) : (assessmentTracker.original ? curator.flatten(assessmentTracker.original, 'assessment') : {});
         var newAssessment = assessment ? curator.flatten(assessment) : (assessmentTracker.original ? curator.flatten(assessmentTracker.original, 'assessment') : {});
         newAssessment.value = assessmentTracker.currentVal;
         if (evidenceUuid) {
@@ -104,7 +115,7 @@ var AssessmentMixin = module.exports.AssessmentMixin = {
         // Start a write of the record to the DB, returning a promise object with:
         //   assessment: fleshed-out assessment as written to the DB.
         //   update: true if an existing object was updated, false if a new object was written.
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             var assessmentPromise;
 
             if (assessment || (assessmentTracker.original && (newAssessment.value !== assessmentTracker.original.value))) {
@@ -126,7 +137,56 @@ var AssessmentMixin = module.exports.AssessmentMixin = {
 
             // Pass to the next THEN, with null if we didn't write an assessment
             resolve(assessmentPromise);
-        }.bind(this));
+        });
+    },
+
+    saveAssessmentHistory: function(assessment, gdm, evidence, update) {
+        var meta;
+
+        if (!assessment) {
+            return Promise.resolve(null);
+        }
+
+        if (experimentalTypes.indexOf(assessment.evidence_type) >= 0) {
+            // Experimental assessment
+            meta = {
+                assessment: {
+                    operation: 'experimental',
+                    value: assessment.value,
+                    experimental: evidence['@id']
+                }
+            };
+        } else if (assessment.evidence_type === 'Segregation') {
+            // Family segregation assessment
+            meta = {
+                assessment: {
+                    operation: 'segregation',
+                    value: assessment.value,
+                    family: evidence['@id']
+                }
+            };
+        } else if (assessment.evidence_type === 'Pathogenicity') {
+            // Variant pathogenicity assessment
+            var variant = (typeof evidence.variant === 'string') ? evidence.variant : evidence.variant['@id'];
+
+            meta = {
+                assessment: {
+                    operation: 'pathogenicity',
+                    value: assessment.value,
+                    gdm: gdm['@id'],
+                    pathogenicity: evidence['@id'],
+                    variant: variant
+                }
+            };
+        } else {
+            // Something's gone wrong
+        }
+
+        // Write assessment history if ready
+        if (meta) {
+            return this.recordHistory(update ? 'modify' : 'add', assessment, meta);
+        }
+        return Promise.resolve(null);
     }
 };
 
@@ -135,8 +195,10 @@ var AssessmentPanel = module.exports.AssessmentPanel = React.createClass({
     mixins: [FormMixin],
 
     propTypes: {
+        ownerNotAssessed: React.PropTypes.bool, // true if evidence assessed already by its creator
+        noSeg: React.PropTypes.bool, // true if evidence is family and there is no segregation data exist.
         assessmentTracker: React.PropTypes.object, // Current value of assessment
-        disabled: React.PropTypes.bool, // TRUE to make assessment dropdown disabled; FALSE to enable it (default)
+        //disabled: React.PropTypes.bool, // TRUE to make assessment dropdown disabled; FALSE to enable it (default)
         panelTitle: React.PropTypes.string, // Title of Assessment panel; 'Assessment' default
         label: React.PropTypes.string, // Label for dropdown; 'Assessment' default
         note: React.PropTypes.string, // Note to display below the dropdown
@@ -149,39 +211,80 @@ var AssessmentPanel = module.exports.AssessmentPanel = React.createClass({
         updateMsg: React.PropTypes.string // String to display by the Update button if desired
     },
 
+    componentDidMount: function() {
+        if (this.props.assessmentTracker && this.props.assessmentTracker.currentVal) {
+            this.refs.assessment.value = this.props.assessmentTracker.currentVal;
+        }
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+        if (this.refs.assessment && nextProps.assessmentTracker && nextProps.assessmentTracker.currentVal == DEFAULT_VALUE) {
+            this.refs.assessment.resetValue();
+        }
+    },
+
     // Called when the dropdown value changes
     handleChange: function(assessmentTracker, e) {
-        var value = this.refs['assessment'].getValue();
-        this.props.updateValue(assessmentTracker, value);
+        if (this.refs.assessment) {
+            var value = this.refs.assessment.getValue();
+            this.props.updateValue(assessmentTracker, value);
+        }
     },
 
     render: function() {
         var panelTitle = this.props.panelTitle ? this.props.panelTitle : 'Assessment';
         var label = this.props.label ? this.props.label : 'Assessment';
-        var value = this.props.assessmentTracker && this.props.assessmentTracker.currentVal;
-        var disabled = (this.props.disabled === true || this.props.disabled === false) ? this.props.disabled : false;
+        //var disabled = (this.props.disabled === true || this.props.disabled === false) ? this.props.disabled : false;
+        //var disabled = this.props.disabled;
+        var noSeg = this.props.noSeg;
+        var value = this.props.assessmentTracker && this.props.assessmentTracker.currentVal ? this.props.assessmentTracker.currentVal : DEFAULT_VALUE;
+        var ownerNotAssessed = this.props.ownerNotAssessed;
         var submitErrClass = 'submit-info pull-right';
+
+        //var disable_note_base = 'The option to assess this evidence is not available since ';
+        //var disable_note_noseg = 'the curator who created it has not yet assessed on it';
+        //var disbale_note_owner = 'no segregation data entered';
 
         return (
             <div>
                 {this.props.assessmentTracker ?
                     <Panel title={panelTitle} accordion={this.props.accordion} open={this.props.open}>
                         <div className="row">
-                            <Input type="select" ref="assessment" label={label + ':'} value={value} handleChange={this.handleChange.bind(null, this.props.assessmentTracker)}
-                                labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" inputDisabled={disabled}>
-                                <option disabled={this.props.disableDefault}>Not Assessed</option>
-                                <option disabled="disabled"></option>
-                                <option>Supports</option>
-                                <option>Review</option>
-                                <option>Contradicts</option>
-                            </Input>
+                            { ownerNotAssessed ?
+                                <p className="alert alert-info">
+                                    The option to assess this evidence does not currently exist since the curator who created it has not yet assessed on it.
+                                </p>
+                            : ( noSeg ?
+                                <p className="alert alert-info">
+                                    The option to assess segregation is not available until some segregation data has been entered.
+                                </p>
+                                : null)
+                            }
+                        </div>
+
+                        <div className="row">
+                            {noSeg ?
+                                <Input type="select" ref="assessment" label={label + ':'} value={value} defaultValue={DEFAULT_VALUE}
+                                    labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" inputDisabled={true}>
+                                    <option value={DEFAULT_VALUE}>Not Assessed</option>
+                                </Input>
+                                :
+                                <Input type="select" ref="assessment" label={label + ':'} value={value} defaultValue={value} handleChange={this.handleChange.bind(null, this.props.assessmentTracker)}
+                                    labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" inputDisabled={ownerNotAssessed ? true : false}>
+                                    <option value={DEFAULT_VALUE} disabled={this.props.disableDefault}>Not Assessed</option>
+                                    <option disabled="disabled"></option>
+                                    <option value="Supports">Supports</option>
+                                    <option value="Review">Review</option>
+                                    <option value="Contradicts">Contradicts</option>
+                                </Input>
+                            }
                             {this.props.note ?
                                 <p className="col-sm-7 col-sm-offset-5">{this.props.note}</p>
                             : null}
                         </div>
                         {this.props.assessmentSubmit ?
                             <div className="curation-submit clearfix">
-                                <Input type="button" inputClassName="btn-primary pull-right" clickHandler={this.props.assessmentSubmit} title="Update" submitBusy={this.props.submitBusy} />
+                                <Input type="button" inputClassName="btn-primary pull-right" clickHandler={this.props.assessmentSubmit} title="Update" submitBusy={this.props.submitBusy} inputDisabled={noSeg || ownerNotAssessed ? true : false} />
                                 {this.props.updateMsg ?
                                     <div className="submit-info pull-right">{this.props.updateMsg}</div>
                                 : null}
@@ -193,6 +296,76 @@ var AssessmentPanel = module.exports.AssessmentPanel = React.createClass({
         );
     }
 });
+
+// Display a history item for adding or or modifying an assessment
+var AssessmentAddModHistory = React.createClass({
+    propTypes: {
+        history: React.PropTypes.object.isRequired, // History object
+        user: React.PropTypes.object // User session session ? '&user=' + session.user_properties.uuid : ''
+    },
+
+    render: function() {
+        var history = this.props.history;
+        var assessment = history.primary;
+        var assessmentMeta = history.meta.assessment;
+        var assessmentRender = null;
+
+        switch (assessmentMeta.operation) {
+            case 'pathogenicity':
+                var gdm = assessmentMeta.gdm;
+                var pathogenicity = assessmentMeta.pathogenicity;
+                var variant = assessmentMeta.variant;
+                var variantId = variant.clinvarVariantId ? variant.clinvarVariantId : variant.otherDescription;
+                var user = this.props.user;
+                var pathogenicityUri = '/variant-curation/?all&gdm=' + gdm.uuid + '&variant=' + variant.uuid + '&pathogenicity=' + pathogenicity.uuid + (user ? '&user=' + user.uuid : '');
+                assessmentRender = (
+                    <div>
+                        <span>Variant <a href={pathogenicityUri}>{variantId}</a> pathogenicity assessed as <strong>{assessmentMeta.value}</strong></span>
+                        <span>; {moment(history.date_created).format("YYYY MMM DD, h:mm a")}</span>
+                    </div>
+                );
+                break;
+
+            case 'segregation':
+                var family = assessmentMeta.family;
+                assessmentRender = (
+                    <div>
+                        <span>Family <a href={family['@id']}>{family.label}</a> segregation assessed as <strong>{assessmentMeta.value}</strong></span>
+                        <span>; {moment(history.date_created).format("YYYY MMM DD, h:mm a")}</span>
+                    </div>
+                );
+                break;
+
+            case 'experimental':
+                var experimental = assessmentMeta.experimental;
+                assessmentRender = (
+                    <div>
+                        <span>Experimental data <a href={experimental['@id']}>{experimental.label}</a> assessed as <strong>{assessmentMeta.value}</strong></span>
+                        <span>; {moment(history.date_created).format("YYYY MMM DD, h:mm a")}</span>
+                    </div>
+                );
+                break;
+
+            default:
+                break;
+        }
+        return assessmentRender;
+    }
+});
+
+globals.history_views.register(AssessmentAddModHistory, 'assessment', 'add');
+globals.history_views.register(AssessmentAddModHistory, 'assessment', 'modify');
+
+
+// Display a history item for deleting an assessment
+var AssessmentDeleteHistory = React.createClass({
+    render: function() {
+        return <div>ASSESSMENTYDELETE</div>;
+    }
+});
+
+globals.history_views.register(AssessmentDeleteHistory, 'assessment', 'delete');
+
 
 // Return the assessment from the given array of assessments that's owned by the curator with the
 // given UUID. The returned assessment is a clone of the original object, so it can be modified

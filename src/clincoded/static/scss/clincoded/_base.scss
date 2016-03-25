@@ -38,10 +38,11 @@ textarea.form-control {
 }
 
 .btn-primary {
-    border: none;
+    border: 1px solid $color-btn;
     background-color: $color-btn;
 
     &:hover {
+        border: 1px solid $color-btn-hover !important;
         background-color: $color-btn-hover !important;
     }
 }
@@ -139,7 +140,7 @@ dl.dl-horizontal {
     font-style: italic;
 }
 
-.icon {
+.icon-alt {
     font-size: 1rem;
 
     @media screen and (min-width: $screen-sm-min) {
@@ -150,4 +151,25 @@ dl.dl-horizontal {
 .notice-bar {
     margin-bottom: 0;
     border-radius: 0;
+}
+
+.alert-demo {
+    color: white;
+    background: #880000;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+}
+
+.demo-background {
+    background-image: url(/static/img/test-bg.svg);
+}
+
+.alert-production {
+    color: #8a6d3b;
+    background: #fed84d;
+    height: 80px;
+    border-top: 1px solid #f4b61f;
+    border-bottom: 1px solid #f4b61f;
+    text-align: center;
+    line-height: 50px;
 }

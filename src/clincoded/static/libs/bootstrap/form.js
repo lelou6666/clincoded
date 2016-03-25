@@ -6,6 +6,7 @@
 // handling validation errors.
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var _ = require('underscore');
 
 
@@ -130,6 +131,16 @@ var FormMixin = module.exports.FormMixin = {
         this.setState({formErrors: errors});
     },
 
+    // Clear errors at multiple Inputs at the same time
+    // When data entered in one Input, error messages in all related Inputs will be cleared.
+    clrMultiFormErrors: function(refs) {
+        var errors = this.state.formErrors;
+        refs.forEach(function(ref){
+            errors[ref] = '';
+        });
+        this.setState({formErrors: errors});
+    },
+
     // Return true if the form's current state shows any Input errors. Return false if no
     // errors are indicated. This should be called in the render function so that the submit
     // form function will have had a chance to record any errors.
@@ -221,7 +232,7 @@ var Input = module.exports.Input = React.createClass({
     // parent components.
     getValue: function() {
         if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'number' || this.props.type === 'textarea') {
-            return React.findDOMNode(this.refs.input).value.trim();
+            return ReactDOM.findDOMNode(this.refs.input).value.trim();
         } else if (this.props.type === 'select') {
             return this.getSelectedOption().trim();
         } else if (this.props.type === 'checkbox') {
@@ -233,11 +244,9 @@ var Input = module.exports.Input = React.createClass({
     toggleValue: function() {
         if (this.props.type === 'checkbox') {
             if (this.props.checked === true) {
-                this.props.checked = false;
                 return false;
             }
             else {
-                this.props.checked = true;
                 return true;
             }
         }
@@ -246,33 +255,42 @@ var Input = module.exports.Input = React.createClass({
     // Set the value of an input
     setValue: function(val) {
         if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'textarea') {
-            React.findDOMNode(this.refs.input).value = val;
+            ReactDOM.findDOMNode(this.refs.input).value = val;
+            this.setState({value: val});
         } else if (this.props.type === 'checkbox') {
-            React.findDOMNode(this.refs.input).checked = val;
+            ReactDOM.findDOMNode(this.refs.input).checked = val;
+            this.setState({value: val});
         }
     },
 
     resetValue: function() {
         if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'textarea') {
-            React.findDOMNode(this.refs.input).value = '';
+            ReactDOM.findDOMNode(this.refs.input).value = '';
         } else if (this.props.type === 'select') {
             this.resetSelectedOption();
         } else if (this.props.type === 'checkbox') {
-            this.props.checked = false;
+            this.resetSelectedCheckbox();
         }
     },
 
+    // Reset <select> to default option
     resetSelectedOption: function() {
-        var selectNode = this.refs.input.getDOMNode();
+        var selectNode = this.refs.input;
         var optionNodes = selectNode.getElementsByTagName('option');
         if (optionNodes && optionNodes.length) {
             selectNode.value = optionNodes[0].value;
         }
     },
 
+    // Reset checkbox
+    resetSelectedCheckbox: function() {
+        var selectNode = this.refs.input;
+        selectNode.checked = false;
+    },
+
     // Get the selected option from a <select> list
     getSelectedOption: function() {
-        var optionNodes = this.refs.input.getDOMNode().getElementsByTagName('option');
+        var optionNodes = this.refs.input.getElementsByTagName('option');
 
         // Get the DOM node for the selected <option>
         var selectedOptionNode = _(optionNodes).find(function(option) {
@@ -374,16 +392,25 @@ var Input = module.exports.Input = React.createClass({
                 );
                 break;
 
-            case 'checkbox':
-                var checkboxInput = (this.props.checked ?
-                    <input className={inputClasses} type={this.props.type} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} checked />
-                    : <input className={inputClasses} type={this.props.type} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} />
+            case 'button-button':
+                // Requires properties:
+                //   title: Label to put into button
+                //   clickHandler: Method to call when button is clicked
+                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '') + (this.props.submitBusy ? ' submit-busy' : '');
+                input = (
+                    <span className={this.props.wrapperClassName}>
+                        <button className={inputClasses} onClick={this.props.clickHandler} disabled={this.props.inputDisabled || this.props.submitBusy}>
+                        {this.props.submitBusy ? <span className="submit-spinner"><i className="icon icon-spin icon-cog"></i></span> : null}{this.props.title}</button>
+                    </span>
                 );
+                break;
+
+            case 'checkbox':
                 input = (
                     <div className={this.props.groupClassName}>
                         {this.props.label ? <label htmlFor={this.props.id} className={this.props.labelClassName}><span>{this.props.label}{this.props.required ? ' *' : ''}</span></label> : null}
                         <div className={this.props.wrapperClassName}>
-                            {checkboxInput}
+                            <input className={inputClasses} ref="input" type={this.props.type} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} checked={this.props.checked} />
                             <div className="form-error">{this.props.error ? <span>{this.props.error}</span> : <span>&nbsp;</span>}</div>
                         </div>
                     </div>

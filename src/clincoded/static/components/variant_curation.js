@@ -10,6 +10,7 @@ var curator = require('./curator');
 var RestMixin = require('./rest').RestMixin;
 var methods = require('./methods');
 var Assessments = require('./assessment');
+var CuratorHistory = require('./curator_history');
 
 var CurationMixin = curator.CurationMixin;
 var RecordHeader = curator.RecordHeader;
@@ -29,10 +30,11 @@ var PmidDoiButtons = curator.PmidDoiButtons;
 var queryKeyValue = globals.queryKeyValue;
 var country_codes = globals.country_codes;
 var truncateString = globals.truncateString;
+var external_url_map = globals.external_url_map;
 
 
 var VariantCuration = React.createClass({
-    mixins: [FormMixin, RestMixin, CurationMixin, AssessmentMixin],
+    mixins: [FormMixin, RestMixin, CurationMixin, AssessmentMixin, CuratorHistory],
 
     contextTypes: {
         navigate: React.PropTypes.func
@@ -141,6 +143,7 @@ var VariantCuration = React.createClass({
     // Note, we have to do this after the component mounts because AJAX DB queries can't be
     // done from unmounted components.
     componentDidMount: function() {
+        this.cv.othersAssessed = false;
         this.loadData();
     },
 
@@ -245,70 +248,80 @@ var VariantCuration = React.createClass({
             promise.then(newAssessmentInfo => {
                 // If this pathogenicity was assessed, then there was no form, so don't write the pathogenicity.
                 if (!this.cv.assessmentTracker.isAssessed()) {
-                    // Convert form values to new flattened pathogenicity object.
-                    var newPathogenicity = this.formToPathogenicity(this.state.pathogenicity);
+                    // Get updated GDM object to make sure we don't create extra pathogenicity objects
+                    return this.getRestData('/gdm/' + this.state.gdm.uuid, null, true).then(freshGdm => {
+                        var freshPathogenicity = curator.getPathogenicityFromVariant(freshGdm, this.queryValues.session_user, this.queryValues.variantUuid);
+                        this.setState({'pathogenicity': freshPathogenicity});
 
-                    // If we made a new assessment, add it to the pathogenicity's assessments
-                    if (newAssessmentInfo.assessment && !newAssessmentInfo.update) {
-                        //if (!newPathogenicity.assessments) {
-                        //    newPathogenicity.assessments = [];
-                        //}
-                        //newPathogenicity.assessments.push(newAssessmentInfo.assessment['@id']);
-                        newPathogenicity.assessments = [newAssessmentInfo.assessment['@id']]; // only login user's assessment is allowed.
-                    }
+                        // Convert form values to new flattened pathogenicity object.
+                        var newPathogenicity = this.formToPathogenicity(this.state.pathogenicity);
 
-                    // Assign a link to the pathogenicity's variant if new
-                    if (!newPathogenicity.variant && this.state.variant) {
-                        newPathogenicity.variant = this.state.variant['@id'];
-                    }
+                        // If we made a new assessment, add it to the pathogenicity's assessments
+                        if (newAssessmentInfo.assessment && !newAssessmentInfo.update) {
+                            //if (!newPathogenicity.assessments) {
+                            //    newPathogenicity.assessments = [];
+                            //}
+                            //newPathogenicity.assessments.push(newAssessmentInfo.assessment['@id']);
+                            newPathogenicity.assessments = [newAssessmentInfo.assessment['@id']]; // only login user's assessment is allowed.
+                        }
 
-                    // Either update or create the pathogenicity object in the DB
-                    if (this.state.pathogenicity) {
-                        // We're editing a pathogenicity. PUT the new pathogenicity object to the DB to update the existing one.
-                        return this.putRestData('/pathogenicity/' + this.state.pathogenicity.uuid, newPathogenicity).then(data => {
-                            return Promise.resolve({pathogenicity: data['@graph'][0], assessment: newAssessmentInfo.assessment});
-                        });
-                    } else {
-                        // We created a pathogenicity; POST it to the DB
-                        return this.postRestData('/pathogenicity/', newPathogenicity).then(data => {
-                            return Promise.resolve({pathogenicity: data['@graph'][0], assessment: newAssessmentInfo.assessment});
-                        });
-                    }
+                        // Assign a link to the pathogenicity's variant if new
+                        if (!newPathogenicity.variant && this.state.variant) {
+                            newPathogenicity.variant = this.state.variant['@id'];
+                        }
+
+                        // Either update or create the pathogenicity object in the DB
+                        if (this.state.pathogenicity) {
+                            // We're editing a pathogenicity. PUT the new pathogenicity object to the DB to update the existing one.
+                            return this.putRestData('/pathogenicity/' + this.state.pathogenicity.uuid, newPathogenicity).then(data => {
+                                return Promise.resolve({pathogenicity: data['@graph'][0], assessment: newAssessmentInfo.assessment});
+                            });
+                        } else {
+                            // We created a pathogenicity; POST it to the DB
+                            return this.postRestData('/pathogenicity/', newPathogenicity).then(data => {
+                                return Promise.resolve({pathogenicity: data['@graph'][0], assessment: newAssessmentInfo.assessment});
+                            });
+                        }
+                    });
                 }
 
                 // No pathogenicity to write because the pathogenicity form is read-only (assessed).
                 return Promise.resolve({pathogenicity: null, assessment: newAssessmentInfo.assessment});
-            }).then(pa => {
-                // If the assessment is missing its evidence_id; fill it in and update the assessment in the DB
-                var newPathogenicity = pa.pathogenicity;
-                //var newAssessment = pa.assessment;
-                //if (newPathogenicity && newAssessment && !newAssessment.evidence_id) {
-                    // We saved a pathogenicity and assessment, and the assessment has no evidence_id. Fix that.
-                    // Nothing relies on this operation completing, so don't wait for a promise from it.
-                //    this.saveAssessment(this.cv.assessmentTracker, this.state.gdm.uuid, newPathogenicity.uuid, newAssessment);
-                //}
-
-                // Next step relies on the pathogenicity, not the updated assessment
-                return Promise.resolve(newPathogenicity);
-            }).then(pathogenicity => {
+            }).then(data => {
                 // Given pathogenicity has been saved (created or updated).
                 // Now update the GDM to include the pathogenicity if it's new
-                if (!this.state.pathogenicity && this.state.gdm && pathogenicity) {
-                    // New pathogenicity; add it to the GDM’s pathogenicity array.
-                    var newGdm = curator.flatten(this.state.gdm);
-                    if (newGdm.variantPathogenicity && newGdm.variantPathogenicity.length) {
-                        newGdm.variantPathogenicity.push(pathogenicity['@id']);
-                    } else {
-                        newGdm.variantPathogenicity = [pathogenicity['@id']];
-                    }
+                if (!this.state.pathogenicity && this.state.gdm && data.pathogenicity) {
+                    return this.getRestData('/gdm/' + this.state.gdm.uuid, null, true).then(freshGdm => {
+                        // New pathogenicity; add it to the GDM’s pathogenicity array.
+                        var newGdm = curator.flatten(freshGdm);
+                        if (newGdm.variantPathogenicity && newGdm.variantPathogenicity.length) {
+                            newGdm.variantPathogenicity.push(data.pathogenicity['@id']);
+                        } else {
+                            newGdm.variantPathogenicity = [data.pathogenicity['@id']];
+                        }
 
-                    // Write the updated GDM
-                    return this.putRestData('/gdm/' + this.state.gdm.uuid, newGdm).then(data => {
-                        return Promise.resolve(data['@graph'][0]);
+                        // Write the updated GDM
+                        return this.putRestData('/gdm/' + this.state.gdm.uuid, newGdm).then(() => {
+                            return Promise.resolve(_.extend(data, {modified: false}));
+                        });
                     });
                 }
-                return Promise.resolve(null);
+
+                // Existing pathogenicity modified
+                return Promise.resolve(_.extend(data, {modified: true}));
             }).then(data => {
+                // Write the pathogenicity history
+                var meta = {
+                    pathogenicity: {
+                        variantId: this.state.variant.clinvarVariantId ? this.state.variant.clinvarVariantId : this.state.variant.otherDescription,
+                        variant: this.state.variant['@id'],
+                        gdm: this.state.gdm['@id']
+                    }
+                };
+                this.recordHistory(data.modified ? 'modify' : 'add', data.pathogenicity ? data.pathogenicity : this.state.pathogenicity, meta).then(() => {
+                    return this.saveAssessmentHistory(data.assessment, this.state.gdm, data.pathogenicity ? data.pathogenicity : this.state.pathogenicity, false);
+                });
+
                 // Now go back to Record Curation
                 this.setState({submitBusy: false}); // done w/ form submission; turn the submit button back on, just in case
                 var gdmQs = this.state.gdm ? '?gdm=' + this.state.gdm.uuid : '';
@@ -324,7 +337,8 @@ var VariantCuration = React.createClass({
         var gdm = this.state.gdm;
         var variant = this.state.variant;
         var pathogenicity = this.state.pathogenicity;
-        var otherPathogenicityList = [];
+        var otherPathogenicityList = []; // pathogenicity generated by other user, not the login user
+        var allPathogenicityList = [];
         var session = (this.props.session && Object.keys(this.props.session).length) ? this.props.session : null;
 
         var curatorName = this.props.session && this.props.session.user_properties ? this.props.session.user_properties.title : '';
@@ -345,14 +359,24 @@ var VariantCuration = React.createClass({
 
         // If we're editing a pathogenicity, get a list of all the variant's pathogenicities, except for the one
         // we're editing. This is to display the list of past curations.
-        // Edited by Kang Liu, 10/14/2015
+        //var assessed = false;
+        var validAssessments = []; // filter out those with value Not Assessed
         if (this.queryValues.all && variant && gdm.variantPathogenicity && gdm.variantPathogenicity.length > 0) {
-            for (var i in gdm.variantPathogenicity) {
-                var pathoVariant = gdm.variantPathogenicity[i].variant;
-                if (pathoVariant.uuid === variant.uuid && gdm.variantPathogenicity[i].submitted_by.uuid !== user) {
-                    otherPathogenicityList.push(gdm.variantPathogenicity[i]);
+            _.map(gdm.variantPathogenicity, patho => {
+                var pathoVariant = patho.variant;
+                if (pathoVariant.uuid === variant.uuid) {
+                    allPathogenicityList.push(patho);
+                    if (patho.submitted_by.uuid !== user) {
+                        otherPathogenicityList.push(patho);
+                    }
+
+                    // collect assessments to the variant from different users
+                    if (patho.assessments && patho.assessments.length && patho.assessments[0].value !== 'Not Assessed') {
+                        //assessed = true;
+                        validAssessments.push(patho.assessments[0]);
+                    }
                 }
-            }
+            });
         }
         //if (this.queryValues.all && variant && variant.associatedPathogenicities && variant.associatedPathogenicities.length) {
         //    otherPathogenicityList = _(variant.associatedPathogenicities).filter(function(fp) {
@@ -366,21 +390,42 @@ var VariantCuration = React.createClass({
 
         return (
             <div>
-                <RecordHeader gdm={gdm} omimId={this.state.currOmimId} updateOmimId={this.updateOmimId} session={session} />
+                <RecordHeader gdm={gdm} omimId={this.state.currOmimId} updateOmimId={this.updateOmimId} session={session} linkGdm={true} pmid={this.queryValues.pmid} />
                 <div className="container">
                     {!this.queryValues.all && annotation && annotation.article ?
                         <div className="curation-pmid-summary">
-                            <PmidSummary article={annotation.article} displayJournal />
+                            <PmidSummary article={annotation.article} displayJournal pmidLinkout />
                         </div>
                     : null}
                     <div className="viewer-titles">
                         <h1>{(pathogenicity ? 'Edit' : 'Curate') + ' Variant Information'}</h1>
-                        {variant ?
-                            <h2>{variant.clinvarVariantId ? <span>{'VariationId: ' + variant.clinvarVariantId}</span> : <span>{'Description: ' + variant.otherDescription}</span>}</h2>
-                        : null}
                         {curatorName ? <h2>{'Curator: ' + curatorName}</h2> : null}
+                        <VariantAssociationsHeader gdm={gdm} variant={variant} />
+                        {variant ?
+                            <h2>{variant.clinvarVariantId ?
+                                <div className="row variant-association-header">
+                                    <dl className="dl-horizontal">
+                                        <dt>{gdm && annotation ? <a href={'/curation-central/?gdm=' + gdm.uuid + '&pmid=' + annotation.article.pmid}><i className="icon icon-briefcase"></i></a> : null} &#x2F;&#x2F; VariationID</dt>
+                                        <dd><a href={external_url_map['ClinVarSearch'] + variant.clinvarVariantId} title={"ClinVar entry for variant " + variant.clinvarVariantId + " in new tab"} target="_blank">{variant.clinvarVariantId}</a></dd>
+                                    </dl>
+                                    <dl className="dl-horizontal">
+                                        <dt>ClinVar Preferred Title</dt>
+                                        <dd>{variant.clinvarVariantTitle ? variant.clinvarVariantTitle : null}</dd>
+                                    </dl>
+                                </div>
+                            :
+                                <div className="row variant-association-header">
+                                    <dl className="dl-horizontal">
+                                        {gdm ? <a href={'/curation-central/?gdm=' + gdm.uuid + (gdm.annotations[0].article.pmid ? '&pmid=' + gdm.annotations[0].article.pmid : '')}><i className="icon icon-briefcase"></i></a> : null}
+                                    </dl>
+                                    <dl className="dl-horizontal">
+                                        <dt>Other Description</dt>
+                                        <dd>{variant.otherDescription ? variant.otherDescription : null}</dd>
+                                    </dl>
+                                </div>
+                            }</h2>
+                        : null}
                     </div>
-                    <VariantAssociationsHeader gdm={gdm} variant={variant} />
                     <div className="row group-curation-content">
                         <div className="col-sm-12">
                             {!this.queryValues.pathogenicityUuid || pathogenicity ?
@@ -394,57 +439,57 @@ var VariantCuration = React.createClass({
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="functionaldomain" label="Variant within functional domain:" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.withinFunctionalDomain)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="frequencysupport" label="Does frequency data support pathogenicity?" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.frequencySupportPathogenicity)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="previouslyreported" label="Previously reported?" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.previouslyReported)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="denovo" label="de novo Type (inferred or confirmed):" defaultValue="none" value={denovoType}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Inferred</option>
-                                                            <option>Confirmed</option>
+                                                            <option value="Inferred">Inferred</option>
+                                                            <option value="Confirmed">Confirmed</option>
                                                         </Input>
                                                         <Input type="select" ref="intrans" label="In trans with another variant:" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.intransWithAnotherVariant)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="supportsegregation" label="Supporting segregation data:" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.supportingSegregation)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="select" ref="supportexperimental" label="Supporting experimental data:" defaultValue="none" value={pathogenicity && curator.booleanToDropdown(pathogenicity.supportingExperimental)}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                                                             <option value="none">No Selection</option>
                                                             <option disabled="disabled"></option>
-                                                            <option>Yes</option>
-                                                            <option>No</option>
+                                                            <option value="Yes">Yes</option>
+                                                            <option value="No">No</option>
                                                         </Input>
                                                         <Input type="textarea" ref="comments" label="Variant comments:" rows="5" value={pathogenicity && pathogenicity.comment}
                                                             labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" />
@@ -452,6 +497,31 @@ var VariantCuration = React.createClass({
                                                 </Panel>
                                             </PanelGroup>
                                         : (pathogenicity ? <VariantCurationView key={pathogenicity.uuid} pathogenicity={pathogenicity} note="Note: To Edit the pathogenicity evaluation, first change your assessment to “Not assessed” and click Save, then Edit the Variant again."/> : null) }
+
+                                        <Panel panelClassName="panel-data">
+                                            <dl className="dl-horizontal">
+                                                <div>
+                                                    <dt>Assessments</dt>
+                                                    <dd>
+                                                        {validAssessments.length ?
+                                                            <div>
+                                                                {validAssessments.map(function(assessment, i) {
+                                                                    return (
+                                                                        <span key={assessment.uuid}>
+                                                                            {assessment.value} ({assessment.submitted_by.title})
+                                                                            {i < validAssessments.length-1 ? <br /> : null}
+                                                                        </span>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        :
+                                                            <div>None</div>
+                                                        }
+                                                    </dd>
+                                                </div>
+                                            </dl>
+                                        </Panel>
+
                                         <AssessmentPanel panelTitle="Variant Assessment" assessmentTracker={this.cv.assessmentTracker} updateValue={this.updateAssessmentValue} accordion open />
                                         <div className="curation-submit clearfix">
                                             <Input type="submit" inputClassName="btn-primary pull-right btn-inline-spacer" id="submit" title="Save" submitBusy={this.state.submitBusy} />
@@ -500,7 +570,7 @@ var VariantCurationView = React.createClass({
                 {pathogenicity && variant ?
                     <Panel title={title} panelClassName="panel-data">
                         {this.props.note ?
-                            <p>{this.props.note}</p>
+                            <p className="alert alert-info">{this.props.note}</p>
                         : null}
                         <dl className="dl-horizontal">
                             <div>
@@ -547,20 +617,6 @@ var VariantCurationView = React.createClass({
                                 <dt>Variant comments</dt>
                                 <dd>{pathogenicity.comment}</dd>
                             </div>
-
-                            <div>
-                                <dt>Assessments</dt>
-                                <dd>
-                                    {assessments.map(function(assessment, i) {
-                                        return (
-                                            <span key={assessment.uuid}>
-                                                {i > 0 ? <br /> : null}
-                                                {assessment.value} ({assessment.submitted_by.title})
-                                            </span>
-                                        );
-                                    })}
-                                </dd>
-                            </div>
                         </dl>
                     </Panel>
                 : null}
@@ -574,7 +630,7 @@ var VariantCurationView = React.createClass({
 var VariantViewer = React.createClass({
     render: function() {
         var pathogenicity = this.props.context;
-        var variant = pathogenicity.variant;
+        var variant = pathogenicity.variantId;
 
         return (
             <div className="container">
@@ -590,3 +646,69 @@ var VariantViewer = React.createClass({
 });
 
 globals.content_views.register(VariantViewer, 'pathogenicity');
+
+
+// Display a history item for adding variant pathogenicities
+var PathogenicityAddModHistory = React.createClass({
+    propTypes: {
+        history: React.PropTypes.object.isRequired, // History object
+        user: React.PropTypes.object // User session session ? '&user=' + session.user_properties.uuid : ''
+    },
+
+    render: function() {
+        var history = this.props.history;
+        var pathogenicity = history.primary;
+        var gdm = history.meta.pathogenicity.gdm;
+        var variant = history.meta.pathogenicity.variant;
+        var user = this.props.user;
+        var pathogenicityUri = '/variant-curation/?all&gdm=' + gdm.uuid + '&variant=' + variant.uuid + '&pathogenicity=' + pathogenicity.uuid + (user ? '&user=' + user.uuid : '');
+
+        return (
+            <div>
+                <span>Variant <a href={pathogenicityUri}>{history.meta.pathogenicity.variantId}</a> pathogenicity {history.operationType === 'add' ? <span>added</span> : <span>modified</span>}</span>
+                <span>; {moment(history.date_created).format("YYYY MMM DD, h:mm a")}</span>
+            </div>
+        );
+    }
+});
+
+globals.history_views.register(PathogenicityAddModHistory, 'pathogenicity', 'add');
+globals.history_views.register(PathogenicityAddModHistory, 'pathogenicity', 'modify');
+
+
+// Display a history item for deleting variant pathogenicities
+var PathogenicityDeleteHistory = React.createClass({
+    render: function() {
+        return <div>PATHOGENICITYDELETE</div>;
+    }
+});
+
+globals.history_views.register(PathogenicityDeleteHistory, 'pathogenicity', 'delete');
+
+
+// Display a history item for adding a variant
+var VariantAddHistory = React.createClass({
+    render: function() {
+        var history = this.props.history;
+        var variant = history.primary;
+
+        return (
+            <div>
+                <span>Variant <strong>{variant.clinvarVariantId ? variant.clinvarVariantId : variant.otherDescription}</strong> added</span>
+                <span>; {moment(history.date_created).format("YYYY MMM DD, h:mm a")}</span>
+            </div>
+        );
+    }
+});
+
+globals.history_views.register(VariantAddHistory, 'variant', 'add');
+
+
+// Display a history item for adding a variant
+var VariantDeleteHistory = React.createClass({
+    render: function() {
+        return <div>VARIANTDELETE</div>;
+    }
+});
+
+globals.history_views.register(VariantDeleteHistory, 'variant', 'delete');

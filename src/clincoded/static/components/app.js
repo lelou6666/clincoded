@@ -34,19 +34,35 @@ var App = module.exports = React.createClass({
 
     triggers: {
         login: 'triggerLogin',
-        logout: 'triggerLogout',
+        logout: 'triggerLogout'
     },
 
+    // Note on context. state.context set from initial props. Navigating to other pages sets this state.
+    // This state gets passed as a property to ContentView, so it should be referenced as props.context
+    // from there.
     getInitialState: function() {
+        var demoWarning = false;
+        var productionWarning = false;
+        if (/production.clinicalgenome.org/.test(url.parse(this.props.href).hostname)) {
+            // check if production URL. Enable productionWarning if it is.
+            productionWarning = true;
+        } else if (!/^(www\.)?curation.clinicalgenome.org/.test(url.parse(this.props.href).hostname)) {
+            // if neither production nor curation URL, enable demoWarning.
+            demoWarning = true;
+        }
         return {
+            context: this.props.context, // Close to anti-pattern, but puts *initial* context into state
+            slow: this.props.slow,
+            href: this.props.href,
             errors: [],
             portal: portal,
-            demoWarning: !/^(www\.)?curation.clinicalgenome.org/.test(url.parse(this.props.href).hostname)
+            demoWarning: demoWarning,
+            productionWarning: productionWarning
         };
     },
 
     currentAction: function() {
-        var href_url = url.parse(this.props.href);
+        var href_url = url.parse(this.state.href);
         var hash = href_url.hash || '';
         var name;
         if (hash.slice(0, 2) === '#!') {
@@ -57,8 +73,8 @@ var App = module.exports = React.createClass({
 
     render: function() {
         var content;
-        var context = this.props.context;
-        var href_url = url.parse(this.props.href);
+        var context = this.state.context;
+        var href_url = url.parse(this.state.href);
         // Switching between collections may leave component in place
         var key = context && context['@id'];
         var current_action = this.currentAction();
@@ -67,7 +83,7 @@ var App = module.exports = React.createClass({
         }
         if (context) {
             var ContentView = globals.content_views.lookup(context, current_action);
-            content = <ContentView {...this.props} context={context}
+            content = <ContentView {...this.props} context={context} href={this.state.href}
                 loadingComplete={this.state.loadingComplete} session={this.state.session}
                 portal={this.state.portal} navigate={this.navigate} href_url={href_url} />;
         }
@@ -76,7 +92,7 @@ var App = module.exports = React.createClass({
         });
 
         var appClass = 'done';
-        if (this.props.slow) {
+        if (this.state.slow) {
             appClass = 'communicating';
         }
 
@@ -106,17 +122,20 @@ var App = module.exports = React.createClass({
                     <link rel="canonical" href={canonical} />
                     <script async src='//www.google-analytics.com/analytics.js'></script>
                     <script data-prop-name="inline" dangerouslySetInnerHTML={{__html: this.props.inline}}></script>
-                    <link rel="stylesheet" href="/static/css/style.css" />
-                    <script src="/static/build/bundle.js" async defer></script>
+                    <link rel="stylesheet" href="@@cssFile" />
+                    <script src="@@bundleJsFile" async defer></script>
                 </head>
-                <body onClick={this.handleClick} onSubmit={this.handleSubmit}>
+                <body onClick={this.handleClick} onSubmit={this.handleSubmit} className={this.state.demoWarning ? "demo-background" : ""}>
                     <script data-prop-name="context" type="application/ld+json" dangerouslySetInnerHTML={{
                         __html: '\n\n' + jsonScriptEscape(JSON.stringify(this.props.context)) + '\n\n'
                     }}></script>
                     <div>
                         <Header session={this.state.session} />
                         {this.state.demoWarning ?
-                        <Notice noticeType='danger' noticeMessage={<span><strong>Note:</strong> This is a demo version of the site. Any data you enter will not be permanently saved.</span>} />
+                        <Notice noticeType='demo' noticeMessage={<span><strong>Note:</strong> This is a demo version of the site. Any data you enter will not be permanently saved.</span>} />
+                        : null}
+                        {this.state.productionWarning ?
+                        <Notice noticeType='production' noticeMessage={<span><strong>Do not use this URL for entering data. Please use <a href="https://curation.clinicalgenome.org/">curation.clinicalgenome.org</a> instead.</strong></span>} />
                         : null}
                         {content}
                     </div>
@@ -160,8 +179,8 @@ var Header = React.createClass({
 
 
 // Render the notice bar, under header, if needed
-// Usage: <Notice noticeType='[TYPE]' noticeMessage={<span>[MESSAGE]</span>} />
-// Appropriate noticeTypes: success, info, warning, danger (bootstrap defaults)
+// Usage: <Notice noticeType='[TYPE]' noticeMessage={<span>[MESSAGE]</span>} {noticeClosable} />
+// Valid noticeTypes: success, info, warning, danger (bootstrap defaults), and demo, production (clingen customs)
 var Notice = React.createClass({
     getInitialState: function () {
         return { noticeVisible: true };
@@ -176,7 +195,9 @@ var Notice = React.createClass({
                 <div className={noticeClass} role="alert">
                     <div className="container">
                         {this.props.noticeMessage}
+                        {this.props.noticeClosable ?
                         <button type="button" className="close" onClick={this.onClick}>&times;</button>
+                        : null}
                     </div>
                 </div>
             );
