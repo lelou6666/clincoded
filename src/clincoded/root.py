@@ -43,10 +43,10 @@ def acl_from_settings(settings):
 
 
 @root
-class EncodedRoot(Root):
+class ClinGenCurationRoot(Root):
     properties = {
         'title': 'Home',
-        'portal_title': 'ENCODE',
+        'portal_title': 'ClinGen',
     }
 
     @reify
@@ -54,6 +54,7 @@ class EncodedRoot(Root):
         acl = acl_from_settings(self.registry.settings) + [
             (Allow, Everyone, ['list', 'search']),
             (Allow, 'group.submitter', ['search_audit', 'audit']),
+            (Allow, Authenticated, ALL_PERMISSIONS),
             (Allow, 'group.admin', ALL_PERMISSIONS),
             (Allow, 'group.forms', ('forms',)),
             # Avoid schema validation errors during audit
@@ -62,7 +63,7 @@ class EncodedRoot(Root):
         return acl
 
     def get(self, name, default=None):
-        resource = super(EncodedRoot, self).get(name, None)
+        resource = super(ClinGenCurationRoot, self).get(name, None)
         if resource is not None:
             return resource
         resource = self.connection.get_by_unique_key('page:location', name)

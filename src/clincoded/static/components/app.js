@@ -20,14 +20,9 @@ var routes = {
 // Site information, including navigation
 var portal = {
     portal_title: 'ClinGen',
-    navMain: [
-        {id: 'dashboard', title: 'Dashboard', url: '/dashboard'},
-        {id: 'group-curation', title: 'Group Curation', url: '/group-curation'},
-        {id: 'create-gene-disease', title: 'Create Gene-Disease', url: '/create-gene-disease'},
-        {id: 'curator', title: 'Curation Central', url: '/curation-central'}
-    ],
     navUser: [
-        {id: 'account', title: 'Account', url: '/account'},
+        {id: 'dashboard', title: 'Dashboard', icon: 'icon-home', url: '/dashboard/'},
+        //{id: 'account', title: 'Account', url: '/account/'},
         {id: 'loginout', title: 'Login'}
     ]
 };
@@ -39,50 +34,74 @@ var App = module.exports = React.createClass({
 
     triggers: {
         login: 'triggerLogin',
-        logout: 'triggerLogout',
+        logout: 'triggerLogout'
     },
 
+    // Note on context. state.context set from initial props. Navigating to other pages sets this state.
+    // This state gets passed as a property to ContentView, so it should be referenced as props.context
+    // from there.
     getInitialState: function() {
+        var demoWarning = false;
+        var productionWarning = false;
+        if (/production.clinicalgenome.org/.test(url.parse(this.props.href).hostname)) {
+            // check if production URL. Enable productionWarning if it is.
+            productionWarning = true;
+        } else if (!/^(www\.)?curation.clinicalgenome.org/.test(url.parse(this.props.href).hostname)) {
+            // if neither production nor curation URL, enable demoWarning.
+            demoWarning = true;
+        }
         return {
+            context: this.props.context, // Close to anti-pattern, but puts *initial* context into state
+            slow: this.props.slow,
+            href: this.props.href,
             errors: [],
-            portal: portal
+            portal: portal,
+            demoWarning: demoWarning,
+            productionWarning: productionWarning
         };
+    },
+
+    currentAction: function() {
+        var href_url = url.parse(this.state.href);
+        var hash = href_url.hash || '';
+        var name;
+        if (hash.slice(0, 2) === '#!') {
+            name = hash.slice(2);
+        }
+        return name;
     },
 
     render: function() {
         var content;
-        var context = this.props.context;
-        var href_url = url.parse(this.props.href);
-        var hash = href_url.hash || '';
-        var name;
-        var context_actions = [];
-        if (hash.slice(0, 2) === '#!') {
-            name = hash.slice(2);
-        }
-
+        var context = this.state.context;
+        var href_url = url.parse(this.state.href);
+        // Switching between collections may leave component in place
         var key = context && context['@id'];
+        var current_action = this.currentAction();
+        if (!current_action && context.default_page) {
+            context = context.default_page;
+        }
         if (context) {
-            Array.prototype.push.apply(context_actions, context.actions || []);
-            if (!name && context.default_page) {
-                context = context.default_page;
-                var actions = context.actions || [];
-                for (var i = 0; i < actions.length; i++) {
-                    var action = actions[i];
-                    if (action.href[0] == '#') {
-                        action.href = context['@id'] + action.href;
-                    }
-                    context_actions.push(action);
-                }
-            }
-
-            var ContentView = globals.content_views.lookup(context, name);
-            content = <ContentView {...this.props} context={context}
+            var ContentView = globals.content_views.lookup(context, current_action);
+            content = <ContentView {...this.props} context={context} href={this.state.href}
                 loadingComplete={this.state.loadingComplete} session={this.state.session}
-                portal={this.state.portal} navigate={this.navigate} />;
+                portal={this.state.portal} navigate={this.navigate} href_url={href_url} />;
         }
         var errors = this.state.errors.map(function (error) {
             return <div className="alert alert-error"></div>;
         });
+
+        var appClass = 'done';
+        if (this.state.slow) {
+            appClass = 'communicating';
+        }
+
+        var title = context.title || context.name || context.accession || context['@id'];
+        if (title && title != 'Home') {
+            title = title + ' – ' + portal.portal_title;
+        } else {
+            title = portal.portal_title;
+        }
 
         var canonical = this.props.href;
         if (context.canonical_uri) {
@@ -101,16 +120,23 @@ var App = module.exports = React.createClass({
                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                     <title>ClinGen</title>
                     <link rel="canonical" href={canonical} />
+                    <script async src='//www.google-analytics.com/analytics.js'></script>
                     <script data-prop-name="inline" dangerouslySetInnerHTML={{__html: this.props.inline}}></script>
-                    <link rel="stylesheet" href="/static/css/style.css" />
-                    <script src="/static/build/bundle.js" async defer></script>
+                    <link rel="stylesheet" href="@@cssFile" />
+                    <script src="@@bundleJsFile" async defer></script>
                 </head>
-                <body onClick={this.handleClick} onSubmit={this.handleSubmit}>
+                <body onClick={this.handleClick} onSubmit={this.handleSubmit} className={this.state.demoWarning ? "demo-background" : ""}>
                     <script data-prop-name="context" type="application/ld+json" dangerouslySetInnerHTML={{
                         __html: '\n\n' + jsonScriptEscape(JSON.stringify(this.props.context)) + '\n\n'
                     }}></script>
                     <div>
                         <Header session={this.state.session} />
+                        {this.state.demoWarning ?
+                        <Notice noticeType='demo' noticeMessage={<span><strong>Note:</strong> This is a demo version of the site. Any data you enter will not be permanently saved.</span>} />
+                        : null}
+                        {this.state.productionWarning ?
+                        <Notice noticeType='production' noticeMessage={<span><strong>Do not use this URL for entering data. Please use <a href="https://curation.clinicalgenome.org/">curation.clinicalgenome.org</a> instead.</strong></span>} />
+                        : null}
                         {content}
                     </div>
                 </body>
@@ -152,6 +178,35 @@ var Header = React.createClass({
 });
 
 
+// Render the notice bar, under header, if needed
+// Usage: <Notice noticeType='[TYPE]' noticeMessage={<span>[MESSAGE]</span>} {noticeClosable} />
+// Valid noticeTypes: success, info, warning, danger (bootstrap defaults), and demo, production (clingen customs)
+var Notice = React.createClass({
+    getInitialState: function () {
+        return { noticeVisible: true };
+    },
+    onClick: function() {
+        this.setState({ noticeVisible: false });
+    },
+    render: function() {
+        var noticeClass = 'notice-bar alert alert-' + this.props.noticeType;
+        if (this.state.noticeVisible) {
+            return (
+                <div className={noticeClass} role="alert">
+                    <div className="container">
+                        {this.props.noticeMessage}
+                        {this.props.noticeClosable ?
+                        <button type="button" className="close" onClick={this.onClick}>&times;</button>
+                        : null}
+                    </div>
+                </div>
+            );
+        }
+        else { return (null); }
+    }
+});
+
+
 var NavbarMain = React.createClass({
     mixins: [NavbarMixin],
 
@@ -160,18 +215,13 @@ var NavbarMain = React.createClass({
     },
 
     render: function() {
+        var headerUrl = '/';
+        if (this.props.session['auth.userid'] !== undefined) headerUrl = '/dashboard/';
         return (
             <div>
-                <div className="navbar-main-bg"></div>
                 <div className="container">
                     <NavbarUser portal={this.props.portal} session={this.props.session} />
-                    <Navbar styles='navbar-main' brand='ClinGen' brandStyles='portal-brand'>
-                        <Nav styles='navbar-right nav-main' collapse>
-                            {this.props.portal.navMain.map(function(menu) {
-                                return <NavItem key={menu.id} href={menu.url}>{menu.title}</NavItem>;
-                            })}
-                        </Nav>
-                    </Navbar>
+                    <a href={headerUrl} className='navbar-brand'>ClinGen Dashboard</a>
                 </div>
             </div>
         );
@@ -187,8 +237,10 @@ var NavbarUser = React.createClass({
             <Nav navbarStyles='navbar-user' styles='navbar-right nav-user'>
                 {this.props.portal.navUser.map(function(menu) {
                     if (menu.url) {
-                        // Normal menu item
-                        return <NavItem key={menu.id} href={menu.url}>{menu.title}</NavItem>;
+                        // Normal menu item; disabled if user is not logged in
+                        if (session && session['auth.userid']) {
+                            return <NavItem key={menu.id} href={menu.url} icon={menu.icon} title={menu.title}>{menu.title}</NavItem>;
+                        }
                     } else {
                         // Trigger menu item; set <a> data attribute to login or logout
                         var attrs = {};

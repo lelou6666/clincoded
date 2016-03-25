@@ -15,7 +15,7 @@ def nameify(s):
     return re.subn(r'\-+', '-', name)[0]
 
 
-def run(wale_s3_prefix, image_id, instance_type,
+def run(wale_s3_prefix, image_id, instance_type, dbrestore,
         branch=None, name=None, role='demo', profile_name=None):
     if branch is None:
         branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('utf-8').strip()
@@ -51,6 +51,7 @@ def run(wale_s3_prefix, image_id, instance_type,
         'WALE_S3_PREFIX': wale_s3_prefix,
         'COMMIT': commit,
         'ROLE': role,
+        'BACKUPDB': dbrestore,
     }
 
     reservation = conn.run_instances(
@@ -60,21 +61,21 @@ def run(wale_s3_prefix, image_id, instance_type,
         user_data=user_data,
         block_device_map=bdm,
         instance_initiated_shutdown_behavior='terminate',
-        instance_profile_name='encoded-instance',
+        instance_profile_name='clincoded-instance',
     )
 
     time.sleep(0.5)  # sleep for a moment to ensure instance exists...
     instance = reservation.instances[0]  # Instance:i-34edd56f
-    print('%s.%s.encodedcc.org' % (instance.id, domain))
+    print('%s.%s.clinicalgenome.org' % (instance.id, domain))
     instance.add_tags({
         'Name': name,
         'branch': branch,
         'commit': commit,
         'started_by': username,
     })
-    print('ssh %s.%s.encodedcc.org' % (name, domain))
+    print('ssh %s.%s.clinicalgenome.org' % (name, domain))
     if domain == 'instance':
-        print('https://%s.demo.encodedcc.org' % name)
+        print('https://%s.demo.clinicalgenome.org' % name)
 
     sys.stdout.write(instance.state)
     while instance.state == 'pending':
@@ -96,25 +97,37 @@ def main():
         return value
 
     parser = argparse.ArgumentParser(
-        description="Deploy ENCODE on AWS",
+        description="Deploy clincoded on AWS",
     )
-    parser.add_argument('-b', '--branch', default=None, help="Git branch or tag")
-    parser.add_argument('-n', '--name', type=hostname, help="Instance name")
-    parser.add_argument('--wale-s3-prefix', default='s3://encoded-backups-prod/production')
     parser.add_argument(
-        '--candidate', action='store_const', default='demo', const='candidate', dest='role',
+        '-b', '--branch', default=None, help="Git branch or tag")
+    parser.add_argument(
+        '-n', '--name', type=hostname, help="Instance name")
+    parser.add_argument(
+        '--wale-s3-prefix', default='s3://clincoded-backups/production')
+    parser.add_argument(
+        '--candidate', action='store_const',
+        default='demo', const='candidate', dest='role',
         help="Deploy candidate instance")
     parser.add_argument(
-        '--test', action='store_const', default='demo', const='test', dest='role',
+        '--test', action='store_const',
+        default='demo', const='test', dest='role',
         help="Deploy to production AWS")
     parser.add_argument(
         '--image-id', default='ami-5189a661',
         help="ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20150325")
     parser.add_argument(
         '--instance-type', default='t2.medium',
-        help="specify 'c4.2xlarge' for faster indexing (you should switch to a smaller "
-             "instance afterwards.)")
-    parser.add_argument('--profile-name', default=None, help="AWS creds profile")
+        help="specify 'c4.2xlarge' for faster indexing "
+             "(you should switch to a smaller instance afterwards.)")
+    parser.add_argument(
+        '--profile-name', default=None, help="AWS creds profile")
+    parser.add_argument(
+        '--dbrestore', default='test_data',
+        help="Load local test data by default, "
+             "'test_gene_and_disease_data' to include local hgnc/orphanet, "
+             "'s3_data' to restore backup from AWS S3")
+
     args = parser.parse_args()
 
     return run(**vars(args))

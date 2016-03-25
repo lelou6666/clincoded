@@ -23,8 +23,8 @@ from contentbase import (
     name='users',
     unique_key='user:email',
     properties={
-        'title': 'DCC Users',
-        'description': 'Listing of current ENCODE DCC users',
+        'title': 'ClinGen Curation Users',
+        'description': 'Listing of current ClinGen Curation users',
     },
     acl=[
         (Allow, 'group.admin', ['list', 'view_details']),
@@ -33,6 +33,7 @@ from contentbase import (
         (Allow, 'remoteuser.INDEXER', ['list', 'view']),
         (Allow, 'remoteuser.EMBED', ['list', 'view']),
         (Allow, Everyone, ['view']),
+        (Allow, 'group.curator', ['view']),
         (Deny, Everyone, ['list', 'view_details']),
     ])
 class User(Item):
@@ -62,7 +63,7 @@ def user_details_view(context, request):
 def user_basic_view(context, request):
     properties = item_view_object(context, request)
     filtered = {}
-    for key in ['@id', '@type', 'uuid', 'lab', 'title']:
+    for key in ['@id', '@type', 'uuid', 'lab', 'title', 'email', 'first_name', 'last_name']:
         try:
             filtered[key] = properties[key]
         except KeyError:

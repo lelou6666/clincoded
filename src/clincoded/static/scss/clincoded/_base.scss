@@ -30,19 +30,19 @@ input[type=password],
 input[type=email],
 input[type=search],
 textarea.form-control {
-    background-color: #f8f8f8;
+    background-color: #fff;
 }
 
 .btn {
     @include border-radius(2px);
-    font-size: 1rem;
 }
 
 .btn-primary {
-    border: none;
+    border: 1px solid $color-btn;
     background-color: $color-btn;
 
     &:hover {
+        border: 1px solid $color-btn-hover !important;
         background-color: $color-btn-hover !important;
     }
 }
@@ -51,12 +51,17 @@ textarea.form-control {
     margin-left: 5px;
 }
 
+// Last button in a panel; gap to bottom of panel
+.btn-last {
+    margin-bottom: 40px;
+}
+
 .site-header {
     position: relative;
     border-top: 6px solid $color-trim;
     border-bottom: 2px solid $color-trim;
     background: white;
- 
+
     @media screen and (min-width: $screen-sm-min) {
         background: url(/static/img/header-bg.jpg) center center no-repeat;
         background-size: cover;
@@ -78,4 +83,93 @@ dl.inline-dl {
         padding: 0;
         line-height: 1.3;
     }
+}
+
+dl.dl-horizontal {
+    margin: 0;
+
+    dt, dd {
+        display: block;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    dt {
+        font-weight: bold;
+        text-overflow: clip;
+        width: auto;
+
+        &:after {
+            content: ": ";
+        }
+    }
+
+    dd {
+        @extend .clearfix;
+    }
+
+    div {
+        clear: both;
+        margin: 6px 0;
+    }
+
+    @media screen and (min-width: $screen-xs-min) {
+        display: table;
+
+        dt, dd {
+            display: table-cell;
+            vertical-align: bottom;
+        }
+
+        dt {
+            padding: 6px 20px 6px 0;
+        }
+
+        dd {
+            padding: 6px 0;
+        }
+
+        div {
+            clear: none;
+            display: table-row;
+        }
+    }
+}
+
+.beta-note {
+    font-style: italic;
+}
+
+.icon-alt {
+    font-size: 1rem;
+
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 1.5rem;
+    }
+}
+
+.notice-bar {
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+.alert-demo {
+    color: white;
+    background: #880000;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+}
+
+.demo-background {
+    background-image: url(/static/img/test-bg.svg);
+}
+
+.alert-production {
+    color: #8a6d3b;
+    background: #fed84d;
+    height: 80px;
+    border-top: 1px solid #f4b61f;
+    border-bottom: 1px solid #f4b61f;
+    text-align: center;
+    line-height: 50px;
 }

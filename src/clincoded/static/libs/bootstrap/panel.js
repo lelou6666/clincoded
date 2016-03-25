@@ -27,7 +27,6 @@ var PanelGroup = module.exports.PanelGroup = React.createClass({
     }
 });
 
-
 // Displays one panel. It can be a child of a PanelGroup if you're doing accordions.
 var Panel = module.exports.Panel = React.createClass({
     propTypes: {
@@ -37,7 +36,8 @@ var Panel = module.exports.Panel = React.createClass({
         ]), // Title for panel header
         open: React.PropTypes.bool, // T if an accordion panel should default to open
         accordion: React.PropTypes.bool, // T if part of an accordion panel group; copied from PanelGroup props
-        panelClassName: React.PropTypes.string // Classes to add to panel
+        panelClassName: React.PropTypes.string, // Classes to add to panel
+        panelBodyClassName: React.PropTypes.string // Classes to add to panel body
     },
 
     getInitialState: function() {
@@ -55,13 +55,20 @@ var Panel = module.exports.Panel = React.createClass({
 
     render: function() {
         var panelWrapperClasses = 'panel panel-default' + (this.props.panelClassName ? ' ' + this.props.panelClassName : '');
-        var panelClasses = 'panel-body panel-std' + ((!this.state.open && this.props.accordion) ? ' panel-closed' : '');
+        var panelClasses = 'panel-body panel-std' + ((!this.state.open && this.props.accordion) ? ' panel-closed' : '') + (this.props.panelBodyClassName ? ' ' + this.props.panelBodyClassName : ' panel-bg-std');
         var indicatorClasses = 'icon panel-header-indicator ' + (this.props.accordion ? (this.state.open ? 'icon-chevron-up' : 'icon-chevron-down') : '');
-        var title = (this.props.accordion ?
-                <a href="#" onClick={this.handleClick}>{this.props.title}</a>
-            :
-                <span>{this.props.title}</span>
-        );
+        var children = (this.props.children instanceof Array && this.props.children.length === 0) ? null : this.props.children;
+        var title;
+
+        if (this.props.accordion) {
+            title = <a href="#" onClick={this.handleClick}>{this.props.title}</a>;
+        } else {
+            if (typeof this.props.title === 'string') {
+                title = <span className="panel-title-std">{this.props.title}</span>;
+            } else {
+                title = <span>{this.props.title}</span>;
+            }
+        }
 
         return (
             <div className={panelWrapperClasses}>
@@ -71,9 +78,11 @@ var Panel = module.exports.Panel = React.createClass({
                         {typeof this.props.title === 'string' ? <h4>{title}</h4> : <span>{title}</span>}
                     </div>
                 : null}
-                <div className={panelClasses}>
-                    {this.props.children}
-                </div>
+                {children ?
+                    <div className={panelClasses}>
+                        {children}
+                    </div>
+                : null}
             </div>
         );
     }

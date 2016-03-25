@@ -8,7 +8,6 @@ var FileInput = require('./inputs').FileInput;
 var audit = require('./audit');
 var _ = require('underscore');
 
-var cx = require('react/lib/cx');
 var AuditIndicators = audit.AuditIndicators;
 var AuditDetail = audit.AuditDetail;
 var AuditMixin = audit.AuditMixin;
@@ -318,12 +317,17 @@ var FetchedForm = React.createClass({
         var type = this.props.type;
         var schemas = this.props.schemas;
         return {
+<<<<<<< HEAD
             schema: jsonSchemaToFormSchema({
                 schemas: schemas,
                 jsonNode: schemas[type],
                 id: this.props.id
             }),
             value: this.props.context || jsonSchemaToDefaultValue(schemas[type]),
+=======
+            schema: null,
+            value: this.props.context || jsonSchemaToDefaultValue(schemas[type])
+>>>>>>> refs/remotes/ClinGen/dev
         };
     },
 
