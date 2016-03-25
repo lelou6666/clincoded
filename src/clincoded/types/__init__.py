@@ -17,7 +17,8 @@ import json
 def includeme(config):
     config.scan()
 
-### new collections added for handling curation data, 06/19/2015
+
+# new collections added for handling curation data, 06/19/2015
 @collection(
     name='genes',
     unique_key='gene:symbol',
@@ -29,6 +30,7 @@ class Gene(Item):
     item_type = 'gene'
     schema = load_schema('clincoded:schemas/gene.json')
     name_key = 'symbol'
+
 
 @collection(
     name='diseases',
@@ -83,6 +85,7 @@ class ControlGroup(Item):
     schema = load_schema('clincoded:schemas/controlGroup.json')
     name_key = 'uuid'
 '''
+
 
 @collection(
     name='articles',
@@ -168,8 +171,8 @@ class Gdm(Item):
         'annotations.groups.otherGenes',
         'annotations.groups.otherPMIDs',
         'annotations.groups.otherPMIDs.submitted_by',
-        #'annotations.groups.statistic',
-        #'annotations.groups.statistic.variants',
+        # 'annotations.groups.statistic',
+        # 'annotations.groups.statistic.variants',
         'annotations.groups.familyIncluded',
         'annotations.groups.familyIncluded.associatedGroups',
         'annotations.groups.familyIncluded.commonDiagnosis',
@@ -207,7 +210,7 @@ class Gdm(Item):
         'annotations.groups.individualIncluded.variants.associatedPathogenicities.submitted_by',
         'annotations.groups.individualIncluded.otherPMIDs',
         'annotations.groups.individualIncluded.otherPMIDs.submitted_by',
-        #'annotations.groups.control',
+        # 'annotations.groups.control',
         'annotations.families',
         'annotations.families.associatedGroups',
         'annotations.families.commonDiagnosis',
@@ -281,7 +284,7 @@ class Gdm(Item):
         "title": "Number of Articles",
         "type": "string",
     })
-    def number_article(seft, annotations):
+    def number_article(self, annotations):
         if len(annotations) > 0:
             return str(len(annotations))
         return ""
@@ -290,7 +293,7 @@ class Gdm(Item):
         "title": "Number of Pathogenicity",
         "type": "string",
     })
-    def number_pathogenicity(seft, variantPathogenicity):
+    def number_pathogenicity(self, variantPathogenicity):
         if len(variantPathogenicity) > 0:
             return str(len(variantPathogenicity))
         return ""
@@ -299,7 +302,7 @@ class Gdm(Item):
         "title": "Number of Provisional",
         "type": "string",
     })
-    def number_provisional(seft, provisionalClassifications):
+    def number_provisional(self, provisionalClassifications):
         if len(provisionalClassifications) > 0:
             return str(len(provisionalClassifications))
         return ""
@@ -308,7 +311,7 @@ class Gdm(Item):
         "title": "GDM",
         "type": "string",
     })
-    def gdm_title(seft, gene, disease, modeCode):
+    def gdm_title(self, gene, disease, modeCode):
         gene_symbol = gene.replace('/genes/', '').replace('/', '')
         orpha_id = disease.replace('/diseases/', '').replace('/', '')
         return gene_symbol + '-' + orpha_id + '-' + modeCode
@@ -357,7 +360,7 @@ class Annotation(Item):
         'groups.individualIncluded.variants.submitted_by',
         'groups.individualIncluded.otherPMIDs',
         'groups.individualIncluded.otherPMIDs.submitted_by',
-        #'groups.control',
+        # 'groups.control',
         'families',
         'families.associatedGroups',
         'families.commonDiagnosis',
@@ -413,7 +416,7 @@ class Annotation(Item):
         "title": "Number of Group",
         "type": "string",
     })
-    def number_group(selft, groups):
+    def number_group(self, groups):
         if len(groups) > 0:
             return len(groups)
         return ""
@@ -422,7 +425,7 @@ class Annotation(Item):
         "title": "Number of Family",
         "type": "string",
     })
-    def number_family(selft, families):
+    def number_family(self, families):
         if len(families) > 0:
             return len(families)
         return ""
@@ -431,7 +434,7 @@ class Annotation(Item):
         "title": "Number of Provisioinal Individual",
         "type": "string",
     })
-    def number_individual(selft, individuals):
+    def number_individual(self, individuals):
         if len(individuals) > 0:
             return len(individuals)
         return ""
@@ -490,6 +493,8 @@ class Group(Item):
         'associatedAnnotations',
         'associatedAnnotations.article',
         'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
         #'control'
     ]
     rev = {
@@ -506,6 +511,7 @@ class Group(Item):
     })
     def associatedAnnotations(self, request, associatedAnnotations):
         return paths_filtered_by_status(request, associatedAnnotations)
+
 
 @collection(
     name='families',
@@ -540,9 +546,13 @@ class Family(Item):
         'associatedGroups.associatedAnnotations',
         'associatedGroups.associatedAnnotations.article',
         'associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedAnnotations',
         'associatedAnnotations.article',
-        'associatedAnnotations.associatedGdm'
+        'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
     ]
     rev = {
         'associatedGroups': ('group', 'familyIncluded'),
@@ -595,17 +605,26 @@ class Individual(Item):
         'associatedGroups.associatedAnnotations',
         'associatedGroups.associatedAnnotations.article',
         'associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies',
         'associatedFamilies.associatedGroups',
         'associatedFamilies.associatedGroups.associatedAnnotations',
         'associatedFamilies.associatedGroups.associatedAnnotations.article',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm.disease',
+        'associatedFamilies.associatedGroups.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies.associatedAnnotations',
         'associatedFamilies.associatedAnnotations.article',
         'associatedFamilies.associatedAnnotations.associatedGdm',
+        'associatedFamilies.associatedAnnotations.associatedGdm.disease',
+        'associatedFamilies.associatedAnnotations.associatedGdm.gene',
         'associatedFamilies.commonDiagnosis',
         'associatedAnnotations',
         'associatedAnnotations.article',
         'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene'
     ]
     rev = {
         'associatedGroups': ('group', 'individualIncluded'),
@@ -677,6 +696,8 @@ class Experimental(Item):
         'associatedAnnotations',
         'associatedAnnotations.article',
         'associatedAnnotations.associatedGdm',
+        'associatedAnnotations.associatedGdm.disease',
+        'associatedAnnotations.associatedGdm.gene',
         'assessments',
         'assessments.submitted_by'
     ]
@@ -813,8 +834,8 @@ class Provisional(Item):
     name='labs',
     unique_key='lab:name',
     properties={
-        'title': 'Labs',
-        'description': 'Listing of ENCODE DCC labs',
+        'title': 'Groups',
+        'description': 'Listing of ClinGen Curation Groups',
     })
 class Lab(Item):
     item_type = 'lab'
@@ -854,7 +875,7 @@ class Organism(Item):
     unique_key='source:name',
     properties={
         'title': 'Sources',
-        'description': 'Listing of sources and vendors for ENCODE material',
+        'description': 'Listing of sources and vendors for ClinGen Curation',
     })
 class Source(Item):
     item_type = 'source'

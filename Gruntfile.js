@@ -1,6 +1,13 @@
 'use strict';
 var reactify = require('./reactify');
 
+<<<<<<< HEAD
+=======
+if (process.env.NODE_ENV == 'production'){
+    console.log("\n****** PRODUCTION ENVIRONMENT ******\n");
+}
+
+>>>>>>> refs/remotes/ClinGen/dev
 //eslint directive to ignore "undefined" global variables 
 /* global __dirname process */
 
@@ -142,6 +149,7 @@ module.exports = function(grunt) {
                 algorithm: 'md5',
                 length: 8
             },
+<<<<<<< HEAD
             images: {
                 src: ['./src/clincoded/static/build/bundle.js', './src/clincoded/static/css/style.css'],
                 dest: './src/clincoded/static/build/tmp'
@@ -164,6 +172,40 @@ module.exports = function(grunt) {
         //         }
         //     }
         // }
+=======
+            css: {
+                src: ['./src/clincoded/static/css/style.css'],
+                dest: './src/clincoded/static/css'
+            },
+            js: {
+                src: ['./src/clincoded/static/build/bundle.js'],
+                dest: './src/clincoded/static/build/'
+            }
+        },
+        replace: {
+            dist: {
+                options: {
+                    patterns: [
+                        {
+                            match: 'bundleJsFile',
+                            replacement: function () {
+                                return grunt.filerev.summary["src/clincoded/static/build/bundle.js"].replace(new RegExp('src/clincoded'), '');
+                            }
+                        },
+                        {
+                            match: 'cssFile',
+                            replacement: function () {
+                                return grunt.filerev.summary["src/clincoded/static/css/style.css"].replace(new RegExp('src/clincoded'), '');
+                            }
+                        }
+                    ]
+                },
+                files: [
+                    {expand: true, flatten: true, src: ['src/clincoded/static/build/*.js'], dest: 'src/clincoded/static/build/'}
+                ]
+            }
+        }
+>>>>>>> refs/remotes/ClinGen/dev
     });
 
     grunt.registerMultiTask('browserify', function (watch) {
@@ -257,11 +299,18 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-filerev');
+<<<<<<< HEAD
     //grunt.loadNpmTasks('grunt-usemin');
 
     //grunt.registerTask('default', ['browserify', 'copy']);
     //grunt.registerTask('default', ['browserify', 'copy', 'useminPrepare', 'filerev', 'usemin']);
     grunt.registerTask('default', ['browserify', 'copy', 'filerev']);
+=======
+    grunt.loadNpmTasks('grunt-replace');
+
+    grunt.registerTask('default', ['browserify', 'copy', 'filerev', 'replace']);
+>>>>>>> refs/remotes/ClinGen/dev
     grunt.registerTask('watch', ['browserify:*:watch', 'wait']);
 
 };
+
