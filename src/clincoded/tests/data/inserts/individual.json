@@ -12,7 +12,7 @@
             "genomeWideStudy": false,
             "genotypingMethods": [
                 "PCR",
-                "HRM"
+                "High resolution melting"
             ],
             "entireGeneSequenced": false,
             "copyNumberAssessed": false,
@@ -28,8 +28,9 @@
             "c71fc085-2683-11e5-b9fe-60f81dc5b05a",
             "3b3af7f0-2685-11e5-bc56-60f81dc5b05a"
         ],
-        "proband": true,
-        "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "proband": false,
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-07-15T22:47:10.000000+00:00"
     },
     {
@@ -46,7 +47,7 @@
             "genomeWideStudy": false,
             "genotypingMethods": [
                 "PCR",
-                "HRM"
+                "High resolution melting"
             ],
             "entireGeneSequenced": false,
             "copyNumberAssessed": false,
@@ -59,7 +60,8 @@
             "35eedfdc-2685-11e5-b6a0-60f81dc5b05a"
         ],
         "proband": true,
-        "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-07-14T12:47:10.000000+00:00"
     },
     {
@@ -75,7 +77,7 @@
             "genomeWideStudy": false,
             "genotypingMethods": [
                 "PCR",
-                "HRM"
+                "High resolution melting"
             ],
             "entireGeneSequenced": false,
             "copyNumberAssessed": false,
@@ -84,7 +86,9 @@
             "additionalInformation": "The coding Exon 3 was PCR ampilified and sequenced",
             "dateTime": "2015-07-14T22:47:10.000000+00:00"
         },
-        "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "proband": false,
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-07-11T22:47:10.000000+00:00"
     },
     {
@@ -100,7 +104,7 @@
             "previousTestingDescription": "method here",
             "genomeWideStudy": true,
             "genotypingMethods": [
-                "Sanger"
+                "Sanger sequencing"
             ],
             "entireGeneSequenced": true,
             "copyNumberAssessed": true,
@@ -113,7 +117,8 @@
             "e9f9a6d7-2685-11e5-8e9c-60f81dc5b05a"
         ],
         "proband": false,
-        "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-07-10T22:47:10.000000+00:00"
     },
     {
@@ -128,7 +133,7 @@
             "previousTestingDescription": "method here",
             "genomeWideStudy": true,
             "genotypingMethods": [
-                "Sanger"
+                "Sanger sequencing"
             ],
             "entireGeneSequenced": true,
             "copyNumberAssessed": true,
@@ -137,7 +142,9 @@
             "additionalInformation": "additional info here.",
             "dateTime": "2015-07-14T22:47:10.000000+00:00"
         },
+        "proband": true,
         "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-02-14T22:47:10.000000+00:00"
     },
     {
@@ -152,7 +159,7 @@
             "previousTestingDescription": "method here",
             "genomeWideStudy": true,
             "genotypingMethods": [
-                "Sanger"
+                "Sanger sequencing"
             ],
             "entireGeneSequenced": true,
             "copyNumberAssessed": true,
@@ -161,7 +168,96 @@
             "additionalInformation": "additional info here.",
             "dateTime": "2015-07-14T22:47:10.000000+00:00"
         },
+        "proband": false,
         "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
         "date_created": "2015-03-09T22:47:10.000000+00:00"
+    },
+    {
+        "uuid": "446140ed-902d-429b-8a6b-855154e68185",
+        "label": "Individual GGG",
+        "diagnosis": [
+            "777"
+        ],
+        "sex": "Female",
+        "method": {
+            "previousTesting": true,
+            "previousTestingDescription": "method here",
+            "genomeWideStudy": true,
+            "genotypingMethods": [
+                "Sanger sequencing"
+            ],
+            "entireGeneSequenced": true,
+            "copyNumberAssessed": true,
+            "specificMutationsGenotyped": true,
+            "specificMutationsGenotypedMethod": "method #2",
+            "additionalInformation": "additional info here.",
+            "dateTime": "2015-08-14T22:47:10.000000+00:00"
+        },
+        "variants": [
+            "d9717187-2685-11e5-9eac-60f81dc5b05a"
+        ],
+        "proband": true,
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-08-19T08:35:18.000000+00:00",
+        "date_created": "2015-03-09T22:47:10.000000+00:00"
+    },
+    {
+        "uuid": "fd7ca9bb-5beb-4dde-95c9-80b54f9ad702",
+        "label": "Individual HHH",
+        "diagnosis": [
+            "15"
+        ],
+        "sex": "Male",
+        "method": {
+            "previousTesting": true,
+            "previousTestingDescription": "method here",
+            "genomeWideStudy": true,
+            "genotypingMethods": [
+                "Sanger sequencing"
+            ],
+            "entireGeneSequenced": true,
+            "copyNumberAssessed": true,
+            "specificMutationsGenotyped": true,
+            "specificMutationsGenotypedMethod": "method #2",
+            "additionalInformation": "additional info here.",
+            "dateTime": "2015-08-14T22:47:10.000000+00:00"
+        },
+        "variants": [
+            "c71fc085-2683-11e5-b9fe-60f81dc5b05a"
+        ],
+        "proband": true,
+        "submitted_by": "d84302eb-ce02-49c2-9ec0-dac58f490bdf",
+        "last_modified": "2015-09-19T08:35:18.000000+00:00",
+        "date_created": "2015-09-09T22:47:10.000000+00:00"
+    },
+    {
+        "uuid": "201aa720-636f-458b-97b4-cbb5336d4978",
+        "label": "Individual III",
+        "diagnosis": [
+            "15"
+        ],
+        "sex": "Male",
+        "method": {
+            "previousTesting": true,
+            "previousTestingDescription": "method here",
+            "genomeWideStudy": true,
+            "genotypingMethods": [
+                "Sanger sequencing"
+            ],
+            "entireGeneSequenced": true,
+            "copyNumberAssessed": true,
+            "specificMutationsGenotyped": true,
+            "specificMutationsGenotypedMethod": "method #2",
+            "additionalInformation": "additional info here.",
+            "dateTime": "2015-08-14T22:47:10.000000+00:00"
+        },
+        "variants": [
+            "e496545c-2685-11e5-a4b3-60f81dc5b05a"
+        ],
+        "proband": true,
+        "submitted_by": "e49d01a5-51f7-4a32-ba0e-b2a71684e4aa",
+        "last_modified": "2015-08-23T08:35:18.000000+00:00",
+        "date_created": "2015-08-09T22:47:10.000000+00:00"
     }
 ]

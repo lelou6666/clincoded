@@ -14,7 +14,8 @@ var Input = form.Input;
 // with <method>.call(this).
 module.exports = {
 
-    render: function(method) {
+    // Render a method panel. 'family' is boolean true if this is a method for family.
+    render: function(method, family) {
         return (
             <div className="row">
                 <Input type="select" ref="prevtesting" label="Previous Testing:" defaultValue="none" value={curator.booleanToDropdown(method.previousTesting)}
@@ -26,8 +27,9 @@ module.exports = {
                 </Input>
                 <Input type="textarea" ref="prevtestingdesc" label="Description of Previous Testing:" rows="5" value={method.previousTestingDescription}
                     labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" />
-                <Input type="select" ref="genomewide" label="Genome-wide Study?:" defaultValue="none" value={curator.booleanToDropdown(method.genomeWideStudy)}
-                    labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
+                <Input type="select" ref="genomewide" label="Were genome-wide analysis methods used to identify the variant(s) described in this publication?:"
+                    defaultValue="none" value={curator.booleanToDropdown(method.genomeWideStudy)}
+                    labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7 label-box-match-middle" groupClassName="form-group">
                     <option value="none">No Selection</option>
                     <option disabled="disabled"></option>
                     <option>Yes</option>
@@ -40,9 +42,9 @@ module.exports = {
                     <option disabled="disabled"></option>
                     <option>Exome sequencing</option>
                     <option>Genotyping</option>
-                    <option>HRM</option>
+                    <option>High resolution melting</option>
                     <option>PCR</option>
-                    <option>Sanger</option>
+                    <option>Sanger sequencing</option>
                     <option>Whole genome shotgun sequencing</option>
                 </Input>
                 <Input type="select" ref="genotypingmethod2" label="Method 2:" defaultValue="none" value={method.genotypingMethods && method.genotypingMethods[1] ? method.genotypingMethods[1] : null}
@@ -51,9 +53,9 @@ module.exports = {
                     <option disabled="disabled"></option>
                     <option>Exome sequencing</option>
                     <option>Genotyping</option>
-                    <option>HRM</option>
+                    <option>High resolution melting</option>
                     <option>PCR</option>
-                    <option>Sanger</option>
+                    <option>Sanger sequencing</option>
                     <option>Whole genome shotgun sequencing</option>
                 </Input>
                 <Input type="select" ref="entiregene" label="Entire gene sequenced?:" defaultValue="none" value={curator.booleanToDropdown(method.entireGeneSequenced)}
@@ -70,17 +72,19 @@ module.exports = {
                     <option>Yes</option>
                     <option>No</option>
                 </Input>
-                <Input type="select" ref="mutationsgenotyped" label="Specific Mutations Genotyped?:" defaultValue="none" value={curator.booleanToDropdown(method.specificMutationsGenotyped)}
+                <Input type="select" ref="mutationsgenotyped" label="Specific mutations genotyped?:" defaultValue="none" value={curator.booleanToDropdown(method.specificMutationsGenotyped)}
                     labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group">
                     <option value="none">No Selection</option>
                     <option disabled="disabled"></option>
                     <option>Yes</option>
                     <option>No</option>
                 </Input>
-                <Input type="textarea" ref="specificmutation" label="Method by which Specific Mutations Genotyped:" rows="5" value={method.specificMutationsGenotypedMethod}
+                <Input type="textarea" ref="specificmutation" label="Description of genotyping method:" rows="5" value={method.specificMutationsGenotypedMethod}
                     labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" />
-                <Input type="textarea" ref="additionalinfomethod" label="Additional Information about Family Method:" rows="8" value={method.additionalInformation}
-                    labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" />
+                {family ?
+                    <Input type="textarea" ref="additionalinfomethod" label="Additional Information about Family Method:" rows="8" value={method.additionalInformation}
+                        labelClassName="col-sm-5 control-label" wrapperClassName="col-sm-7" groupClassName="form-group" />
+                : null}
             </div>
         );
     },
@@ -133,6 +137,6 @@ module.exports = {
         newMethod.dateTime = moment().format();
 
         return Object.keys(newMethod).length ? newMethod : null;
-    },
+    }
 
 };

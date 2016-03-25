@@ -6,6 +6,7 @@
 // handling validation errors.
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var _ = require('underscore');
 
 
@@ -69,9 +70,6 @@ var FormMixin = module.exports.FormMixin = {
     // returned. If the Input had an entered value but it wasn't numeric, null is returned.
     // If the Input had a proper numberic value, a Javascript 'number' type is returned
     // with the entered value.
-    // If min and max are defined, we additionally check to make sure it fits within the bounds
-    // defined by the values of min and max. min defaults to 0, and max has no default but can
-    // be undefined.
     getFormValueNumber: function(ref) {
         var value = this.getFormValue(ref);
         if (value) {
@@ -133,6 +131,16 @@ var FormMixin = module.exports.FormMixin = {
         this.setState({formErrors: errors});
     },
 
+    // Clear errors at multiple Inputs at the same time
+    // When data entered in one Input, error messages in all related Inputs will be cleared.
+    clrMultiFormErrors: function(refs) {
+        var errors = this.state.formErrors;
+        refs.forEach(function(ref){
+            errors[ref] = '';
+        });
+        this.setState({formErrors: errors});
+    },
+
     // Return true if the form's current state shows any Input errors. Return false if no
     // errors are indicated. This should be called in the render function so that the submit
     // form function will have had a chance to record any errors.
@@ -156,13 +164,15 @@ var FormMixin = module.exports.FormMixin = {
         var valid = true;
         Object.keys(this.refs).forEach(ref => {
             var props = this.refs[ref].props;
-            if (props.required && !this.getFormValue(ref)) {
+            var val = this.getFormValue(ref);
+            val = (props.type === 'select' && val === 'none') ? null : val;
+            if (props.required && !val) {
                 // Required field has no value. Set error state to render
                 // error, and remember to return false.
                 this.setFormErrors(ref, 'Required');
                 valid = false;
-            } else if (props.format === 'number') {
-                // Validate that format="number" fields have a valid number in them
+            } else if (props.type === 'number') {
+                // Validate that type="number" fields have a valid number in them
                 var numVal = this.getFormValueNumber(ref);
                 if (numVal === null) {
                     this.setFormErrors(ref, 'Number only');
@@ -209,8 +219,9 @@ var Input = module.exports.Input = React.createClass({
         clickHandler: React.PropTypes.func, // Called to handle button click
         submitHandler: React.PropTypes.func, // Called to handle submit button click
         cancelHandler: React.PropTypes.func, // Called to handle cancel button click
-        minNum: React.PropTypes.number, // Minimum value for a number formatted input
-        maxNum: React.PropTypes.number // Maximum value for a number formatted input
+        submitBusy: React.PropTypes.bool, //
+        minVal: React.PropTypes.number, // Minimum value for a number formatted input
+        maxVal: React.PropTypes.number // Maximum value for a number formatted input
     },
 
     getInitialState: function() {
@@ -220,40 +231,66 @@ var Input = module.exports.Input = React.createClass({
     // Get the text the user entered from the text-type field. Meant to be called from
     // parent components.
     getValue: function() {
-        if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'textarea') {
-            return React.findDOMNode(this.refs.input).value.trim();
+        if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'number' || this.props.type === 'textarea') {
+            return ReactDOM.findDOMNode(this.refs.input).value.trim();
         } else if (this.props.type === 'select') {
             return this.getSelectedOption().trim();
+        } else if (this.props.type === 'checkbox') {
+            return this.props.checked;
+        }
+    },
+
+    // Toggles value for checkboxes
+    toggleValue: function() {
+        if (this.props.type === 'checkbox') {
+            if (this.props.checked === true) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    },
+
+    // Set the value of an input
+    setValue: function(val) {
+        if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'textarea') {
+            ReactDOM.findDOMNode(this.refs.input).value = val;
+            this.setState({value: val});
+        } else if (this.props.type === 'checkbox') {
+            ReactDOM.findDOMNode(this.refs.input).checked = val;
+            this.setState({value: val});
         }
     },
 
     resetValue: function() {
         if (this.props.type === 'text' || this.props.type === 'email' || this.props.type === 'textarea') {
-            React.findDOMNode(this.refs.input).value = '';
+            ReactDOM.findDOMNode(this.refs.input).value = '';
         } else if (this.props.type === 'select') {
             this.resetSelectedOption();
+        } else if (this.props.type === 'checkbox') {
+            this.resetSelectedCheckbox();
         }
     },
 
+    // Reset <select> to default option
     resetSelectedOption: function() {
-        var optionNodes = this.refs.input.getDOMNode().getElementsByTagName('option');
-
-        // Get the DOM node for the selected <option>
-        var selectedOptionNode = _(optionNodes).find(function(option) {
-            return option.selected;
-        });
-
-        // Clear the selected option and set it to the first option
-        if (selectedOptionNode) {
-            selectedOptionNode.selected = false;
-            optionNodes[0] = true;
+        var selectNode = this.refs.input;
+        var optionNodes = selectNode.getElementsByTagName('option');
+        if (optionNodes && optionNodes.length) {
+            selectNode.value = optionNodes[0].value;
         }
+    },
 
+    // Reset checkbox
+    resetSelectedCheckbox: function() {
+        var selectNode = this.refs.input;
+        selectNode.checked = false;
     },
 
     // Get the selected option from a <select> list
     getSelectedOption: function() {
-        var optionNodes = this.refs.input.getDOMNode().getElementsByTagName('option');
+        var optionNodes = this.refs.input.getElementsByTagName('option');
 
         // Get the DOM node for the selected <option>
         var selectedOptionNode = _(optionNodes).find(function(option) {
@@ -288,10 +325,12 @@ var Input = module.exports.Input = React.createClass({
         switch (this.props.type) {
             case 'text':
             case 'email':
+            case 'number':
+                var inputType = this.props.type === 'number' ? 'text' : this.props.type;
                 inputClasses = 'form-control' + (this.props.error ? ' error' : '') + (this.props.inputClassName ? ' ' + this.props.inputClassName : '');
                 var innerInput = (
                     <span>
-                        <input className={inputClasses} type={this.props.type} id={this.props.id} name={this.props.id} placeholder={this.props.placeholder} ref="input" value={this.state.value} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} />
+                        <input className={inputClasses} type={inputType} id={this.props.id} name={this.props.id} placeholder={this.props.placeholder} ref="input" value={this.state.value} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} />
                         <div className="form-error">{this.props.error ? <span>{this.props.error}</span> : <span>&nbsp;</span>}</div>
                     </span>
                 );
@@ -308,7 +347,7 @@ var Input = module.exports.Input = React.createClass({
                     <div className={this.props.groupClassName}>
                         {this.props.label ? <label htmlFor={this.props.id} className={this.props.labelClassName}><span>{this.props.label}{this.props.required ? ' *' : ''}</span></label> : null}
                         <div className={this.props.wrapperClassName}>
-                            <select className="form-control" ref="input" onChange={this.handleChange.bind(null, this.props.id)} defaultValue={this.props.value ? this.props.value : this.props.defaultValue} disabled={this.props.inputDisabled}>
+                            <select className="form-control" ref="input" onChange={this.handleChange.bind(null, this.props.id)} defaultValue={this.props.hasOwnProperty('value') ? this.props.value : this.props.defaultValue} disabled={this.props.inputDisabled}>
                                 {this.props.children}
                             </select>
                             <div className="form-error">{this.props.error ? <span>{this.props.error}</span> : <span>&nbsp;</span>}</div>
@@ -345,17 +384,47 @@ var Input = module.exports.Input = React.createClass({
                 // Requires properties:
                 //   title: Label to put into button
                 //   clickHandler: Method to call when button is clicked
-                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '');
+                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '') + (this.props.submitBusy ? ' submit-busy' : '');
                 input = (
-                    <input className={inputClasses} type={this.props.type} value={this.props.title} onClick={this.props.clickHandler} disabled={this.props.inputDisabled} />
+                    <span className={this.props.wrapperClassName}>
+                        <input className={inputClasses} type={this.props.type} value={this.props.title} onClick={this.props.clickHandler} disabled={this.props.inputDisabled || this.props.submitBusy} />
+                    </span>
+                );
+                break;
+
+            case 'button-button':
+                // Requires properties:
+                //   title: Label to put into button
+                //   clickHandler: Method to call when button is clicked
+                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '') + (this.props.submitBusy ? ' submit-busy' : '');
+                input = (
+                    <span className={this.props.wrapperClassName}>
+                        <button className={inputClasses} onClick={this.props.clickHandler} disabled={this.props.inputDisabled || this.props.submitBusy}>
+                        {this.props.submitBusy ? <span className="submit-spinner"><i className="icon icon-spin icon-cog"></i></span> : null}{this.props.title}</button>
+                    </span>
+                );
+                break;
+
+            case 'checkbox':
+                input = (
+                    <div className={this.props.groupClassName}>
+                        {this.props.label ? <label htmlFor={this.props.id} className={this.props.labelClassName}><span>{this.props.label}{this.props.required ? ' *' : ''}</span></label> : null}
+                        <div className={this.props.wrapperClassName}>
+                            <input className={inputClasses} ref="input" type={this.props.type} onChange={this.handleChange.bind(null, this.props.id)} disabled={this.props.inputDisabled} checked={this.props.checked} />
+                            <div className="form-error">{this.props.error ? <span>{this.props.error}</span> : <span>&nbsp;</span>}</div>
+                        </div>
+                    </div>
                 );
                 break;
 
             case 'submit':
                 title = this.props.title ? this.props.title : 'Submit';
-                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '');
+                inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '') + (this.props.submitBusy ? ' submit-busy' : '');
                 input = (
-                    <button className={inputClasses} onClick={this.props.submitHandler} disabled={this.props.inputDisabled}>{title}</button>
+                    <span className={this.props.wrapperClassName}>
+                        <button className={inputClasses} onClick={this.props.submitHandler} disabled={this.props.inputDisabled || this.props.submitBusy}>
+                        {this.props.submitBusy ? <span className="submit-spinner"><i className="icon icon-spin icon-cog"></i></span> : null}{title}</button>
+                    </span>
                 );
                 break;
 
@@ -363,7 +432,9 @@ var Input = module.exports.Input = React.createClass({
                 title = this.props.title ? this.props.title : 'Cancel';
                 inputClasses = 'btn' + (this.props.inputClassName ? ' ' + this.props.inputClassName : '');
                 input = (
-                    <button className={inputClasses} onClick={this.props.cancelHandler} disabled={this.props.inputDisabled}>{title}</button>
+                    <span className={this.props.wrapperClassName}>
+                        <button className={inputClasses} onClick={this.props.cancelHandler} disabled={this.props.inputDisabled}>{title}</button>
+                    </span>
                 );
                 break;
 

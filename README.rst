@@ -32,10 +32,22 @@ Note: For Mac < 10.9, the system python doesn't work. You should install Python 
 
     $ brew install python3
 
-Install Node 0.10 from homebrew/versions::
+Install Node v5  (check version: `node --version`)
 
-    $ brew tap homebrew/versions
-    $ brew install node010
+  * via homebrew (homebrew will indicate if you need to unlink a prior version of node)::
+
+    $ brew install node
+
+  * or via nvm::
+
+    $ npm install -g nvm
+    $ nvm install 5.0
+    $ nvm use 5.0
+
+Insure you are using npm 3 (check version: `npm --version`), if necessary update npm to npm 3::
+
+    $ npm install npm -g
+
 
 If you need to update dependencies::
 
@@ -62,7 +74,7 @@ Note: These will all be installed locally for the application and should never c
 Step 1b: Run buildout::
 
     $ python3.4 bootstrap.py -v 2.3.1 --setuptools-version 15.2
-    $ bin/buildout
+    $ bin/buildout -c buildout-dev.cfg
 
 If you see a clang error like this::
 
@@ -140,8 +152,8 @@ If you wish a clean db wipe for DEVELOPMENT::
 
 Database setup on VMs::
 
-    # service postgresql-9.3 initdb
-    # service postgresql-9.3 start
+    # service postgresql-9.4 initdb
+    # service postgresql-9.4 start
     # sudo -u postgres createuser --createdb clincoded
 
 Then as the clincoded user::
@@ -201,15 +213,14 @@ Notes on SublimeLinter
 To setup SublimeLinter with Sublime Text 3, first install the linters::
 
     $ easy_install-2.7 flake8
-    $ npm install -g jshint
-    $ npm install -g jsxhint
+    $ npm install -g eslint
+    $ npm install -g eslint-plugin-react
 
 After first setting up `Package Control`_ (follow install and usage instructions on site), use it to install the following packages in Sublime Text 3:
 
     * sublimelinter
     * sublimelinter-flake8
-    * sublimelinter-jsxhint
-    * jsx
-    * sublimelinter-jshint
+    * SublimeLinter-contrib-eslint (`instructions <https://github.com/roadhump/SublimeLinter-eslint#plugin-installation>`_)
+    * babel (`instructions <https://github.com/babel/babel-sublime#setting-as-the-default-syntax>`_)
 
 .. _`Package Control`: https://sublime.wbond.net/

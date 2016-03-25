@@ -4,7 +4,7 @@
     "description": "Schema for storing and using assessments",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["submitted_by", "value", "date_created"],
+    "required": ["value"],
     "identifyingProperties": ["uuid"],
     "additionalProperties": false,
     "mixinProperties": [
@@ -21,10 +21,23 @@
             "description": "Value of assessment",
             "type": "string",
             "enum": [
+                "Not Assessed",
                 "Supports",
                 "Review",
                 "Contradicts"
             ]
+        },
+        "evidence_type": {
+            "description": "Object type of assessed evidence",
+            "type": "string"
+        },
+        "evidence_id": {
+            "description": "uuid of assessed evidence",
+            "type": "string"
+        },
+        "evidence_gdm": {
+            "description": "uuid of GDM the assessed evidence belonging to",
+            "type": "string"
         },
         "active": {
             "title": "Active",
@@ -35,11 +48,31 @@
     },
     "columns": {
         "uuid": {
-            "title": "Assessment",
+            "title": "UUID",
+            "type": "string"
+        },
+        "submitted_by.email": {
+            "title": "Owner",
+            "type": "string"
+        },
+        "evidence_type": {
+            "title": "Evidence Type",
+            "type": "string"
+        },
+        "evidence_gdm": {
+            "title": "GDM",
             "type": "string"
         },
         "value": {
             "Title": "Value",
+            "type": "string"
+        },
+        "date_created": {
+            "title": "Creation Date",
+            "type": "string"
+        },
+        "last_modified": {
+            "title": "Last Modified",
             "type": "string"
         }
     }

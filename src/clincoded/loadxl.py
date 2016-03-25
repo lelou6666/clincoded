@@ -30,7 +30,10 @@ ORDER = [
     'group',
     'experimental',
     'annotation',
+    'pathogenicity',
+    'provisionalClassification',
     'gdm',
+    'curatorHistory',
     'curator_page', # keep at bottom so it can load other type data
 ]
 

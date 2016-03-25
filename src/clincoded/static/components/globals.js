@@ -20,6 +20,9 @@ module.exports.blocks = new Registry();
 // Curator page view
 module.exports.curator_page = new Registry();
 
+// History display view
+module.exports.history_views = new Registry();
+
 
 var itemClass = module.exports.itemClass = function (context, htmlClass) {
     htmlClass = htmlClass || '';
@@ -53,11 +56,13 @@ module.exports.userMatch = function(user, session) {
     return false;
 };
 
+// Trancate the given string to the given number of characters, but pull the truncation back to
+// the word boundary before the truncation point.
 module.exports.truncateString = function (str, len) {
     if (str.length > len) {
         str = str.replace(/(^\s)|(\s$)/gi, ''); // Trim leading/trailing white space
-        var isOneWord = str.match(/\s/gi) === null; // Detect single-word string
         str = str.substr(0, len - 1); // Truncate to length ignoring word boundary
+        var isOneWord = str.match(/\s/gi) === null; // Detect single-word string
         str = (!isOneWord ? str.substr(0, str.lastIndexOf(' ')) : str) + '…'; // Back up to word boundary
     }
     return str;
@@ -93,15 +98,15 @@ module.exports.queryKeyValue = function (key, href) {
     return undefined;
 };
 
-// Order that antibody statuses should be displayed
-module.exports.statusOrder = [
-    'eligible for new data',
-    'not eligible for new data',
-    'pending dcc review',
-    'awaiting lab characterization',
-    'not pursued',
-    'not reviewed'
-];
+// Add a key-value pair as a query string to the given href. If href already
+// has query string values, this function adds the given key value to it.
+module.exports.addQueryKey = function(href, key, value) {
+    var existingQuery = href.split(/\?(.+)?/)[1];
+    if (existingQuery) {
+        return href + '&' + key + '=' + value;
+    }
+    return href + '?' + key + '=' + value;
+};
 
 
 module.exports.productionHost = {'curation.clinicalgenome.org':1};
@@ -137,9 +142,22 @@ module.exports.external_url_map = {
     'PubMedSearch': '//eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=PubMed&retmode=xml&id=',
     'PubMed': 'https://www.ncbi.nlm.nih.gov/pubmed/',
     'OrphaNet': 'http://www.orpha.net/consor/cgi-bin/OC_Exp.php?lng=EN&Expert=',
+    'OrphanetHome': 'http://www.orpha.net/',
     'HGNC': 'http://www.genenames.org/cgi-bin/gene_symbol_report?hgnc_id=',
+    'HGNCHome': 'http://www.genenames.org/',
     'Entrez': 'http://www.ncbi.nlm.nih.gov/gene/',
-    'OMIM': 'http://omim.org/'
+    'OMIM': 'http://omim.org/',
+    'ClinVar': 'http://www.ncbi.nlm.nih.gov/clinvar/',
+    'ClinVarSearch': 'http://www.ncbi.nlm.nih.gov/clinvar/variation/',
+    'HPO': 'http://compbio.charite.de/hpoweb/showterm?id=',
+    'HPOBrowser': 'http://compbio.charite.de/hpoweb/showterm?id=HP:0000118',
+    'Uberon': 'http://uberon.github.io/',
+    'UberonSearch': 'http://www.ontobee.org/browser/rdf.php?o=UBERON&iri=http://purl.obolibrary.org/obo/',
+    'GO_Slim': 'http://bit.ly/1fxDvhV',
+    'QuickGoSearch': 'http://www.ebi.ac.uk/QuickGO/GTerm?id=',
+    'CL': 'http://www.ontobee.org/browser/index.php?o=CL',
+    'CLSearch': 'http://www.ontobee.org/browser/rdf.php?o=CL&iri=http://purl.obolibrary.org/obo/',
+    'EFO': 'http://www.ebi.ac.uk/efo/'
 };
 
 

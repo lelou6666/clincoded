@@ -4,17 +4,18 @@
     "description": "Schema for storing and using family data",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["label", "commonDiagnosis"],
+    "required": ["label"],
     "identifyingProperties": ["uuid"],
     "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" }
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/standard_status" }
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "3"
         },
         "label": {
             "title": "Label",
@@ -91,7 +92,8 @@
             "enum": [
                 "",
                 "Hispanic or Latino",
-                "Not Hispanic or Latino"
+                "Not Hispanic or Latino",
+                "Unknown"
             ]
         },
         "race": {
@@ -183,9 +185,9 @@
                         "enum": [
                             "Exome sequencing",
                             "Genotyping",
-                            "HRM",
+                            "High resolution melting",
                             "PCR",
-                            "Sanger",
+                            "Sanger sequencing",
                             "Whole genome shotgun sequencing"
                         ]
                     }
@@ -233,14 +235,12 @@
                 "dateTime": {
                     "title": "Date Time",
                     "description": "Time stamp for creation",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "pedigreeDescription": {
                     "title": "Pedigree Description",
                     "description": "Pedigree Description",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "pedigreeSize": {
                     "title": "Pedigree Size",
@@ -269,7 +269,6 @@
                     "title": "de novo type",
                     "description": "de novo type",
                     "type": "string",
-                    "default": "",
                     "enum": [
                         "",
                         "Inferred",
@@ -324,8 +323,7 @@
                 "additionalInformation": {
                     "title": "Additional Information",
                     "description": "Additional information of the segregation",
-                    "type": "string",
-                    "default": ""
+                    "type": "string"
                 },
                 "variants": {
                     "title": "Variants Associated with Proband",
@@ -379,6 +377,11 @@
                 "type": "string",
                 "linkTo": "individual"
             }
+        },
+        "active": {
+            "description": "boolean switch to set if the family avaliable for curation.",
+            "type": "boolean",
+            "default": true
         }
     },
     "columns": {
